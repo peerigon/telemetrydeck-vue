@@ -12,6 +12,12 @@ function enhancePayload(payload: TelemetryDeckPayload = {}): EnhancedPayload {
 export function useTelemetryDeck() {
   const td = inject<TelemetryDeck>('td');
 
+  const setClientUser = async (clientUser: string) => {
+    if (td) {
+      td.clientUser = clientUser;
+    }
+  };
+
   const signal = async (type: string, payload?: TelemetryDeckPayload, options?: TelemetryDeckOptions) => {
     return td?.signal(type, enhancePayload(payload), options);
   };
@@ -21,6 +27,7 @@ export function useTelemetryDeck() {
   };
 
   return {
+    setClientUser,
     signal,
     queue,
   };
