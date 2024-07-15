@@ -1,8 +1,5 @@
 name: Test and 🚀 Release
 on:
-    pull_request:
-      branches:
-        - main
     push:
       branches:
         - main
@@ -44,4 +41,4 @@ jobs:
             NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
             npm install @semantic-release/changelog @semantic-release/git --ignore-scripts --no-save
-            npx semantic-release --dry-run
+            npx semantic-release
