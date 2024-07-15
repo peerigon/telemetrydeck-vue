@@ -31,12 +31,18 @@ describe('App', () => {
 
     const signalClickButton = wrapper.find('#btnSignalClick');
     const queueClickButton = wrapper.find('#btnQueueClick');
+    const signalClickButtonWithOptions = wrapper.find('#btnSignalClickWithOptions');
+    const queueClickButtonWithOptions = wrapper.find('#btnQueueClickWithOptions');
     const setClientUserButton = wrapper.find('#btnSetClient');
     expect(signalClickButton.exists()).toBe(true);
     expect(queueClickButton.exists()).toBe(true);
+    expect(signalClickButtonWithOptions.exists()).toBe(true);
+    expect(queueClickButtonWithOptions.exists()).toBe(true);
     expect(setClientUserButton.exists()).toBe(true);
     expect(signalClickButton.text()).toBe('Log a click with signal');
     expect(queueClickButton.text()).toBe('Log a click with queue');
+    expect(signalClickButtonWithOptions.text()).toBe('Log a click with signal with Options');
+    expect(queueClickButtonWithOptions.text()).toBe('Log a click with queue with Options');
     expect(setClientUserButton.text()).toBe('Change user');
   });
 
@@ -58,6 +64,17 @@ describe('App', () => {
     await wrapper.find('#btnQueueClick').trigger('click');
     expect(mockTelemetryDeck.queue).toHaveBeenCalledTimes(1);
     expect(mockTelemetryDeck.queue).toHaveBeenCalledWith('example_queue_event_name', { tdVueVersion: LIB_VERSION, custom_data: 'other_data', timestamp: expect.any(String) }, undefined);
+
+    // Test button click event for buttonQueueClickWithOptions
+    await wrapper.find('#btnQueueClickWithOptions').trigger('click');
+    expect(mockTelemetryDeck.queue).toHaveBeenCalledTimes(2);
+    expect(mockTelemetryDeck.queue).toHaveBeenCalledWith('example_queue_event_name', { tdVueVersion: LIB_VERSION, custom_data: 'other_data', timestamp: expect.any(String) }, { testMode: true, clientUser: 'other_user', appID: "other_app_id" });
+
+    // Test button click event for buttonQueueClickWithOptions
+    await wrapper.find('#btnSignalClickWithOptions').trigger('click');
+    expect(mockTelemetryDeck.signal).toHaveBeenCalledTimes(2);
+    expect(mockTelemetryDeck.signal).toHaveBeenCalledWith('example_signal_event_name', { tdVueVersion: LIB_VERSION, custom_data: 'other_data', timestamp: expect.any(String) }, { testMode: true, clientUser: 'other_user', appID: "other_app_id" });
+
 
     // Test button click event for changeClientUserClick
     let prevClientUser = mockTelemetryDeck.clientUser;
