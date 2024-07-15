@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { useTelemetryDeck } from './hooks';
+  import { useTelemetryDeck } from "./"
   const { signal, queue, setClientUser } = useTelemetryDeck();
 
   const changeClientUserClick = () => {

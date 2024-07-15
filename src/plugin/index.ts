@@ -1,9 +1,13 @@
 import TelemetryDeck from "@telemetrydeck/sdk";
 import type { Plugin } from 'vue';
 
-const plugin: Plugin = {
+export const plugin: Plugin = {
   install(app, options) {
+    if (!options.appID) {
+      throw new Error('TelemetryDeck appID is required');
+    }
     const td = options.appID
+
     ? new TelemetryDeck({
         appID: options.appID,
         clientUser: options.clientUser || 'guest',
@@ -13,5 +17,3 @@ const plugin: Plugin = {
     app.provide('td', td);
   },
 };
-
-export default plugin;

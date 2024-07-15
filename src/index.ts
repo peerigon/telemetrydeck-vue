@@ -1,2 +1,3 @@
 export * from "./hooks";
-export * from "./plugin";
+import { plugin } from "./plugin";
+export default plugin;
