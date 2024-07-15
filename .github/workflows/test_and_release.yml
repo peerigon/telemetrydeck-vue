@@ -1,4 +1,4 @@
-name: Test, lint, build
+name: Test and 🚀 Release
 on:
     pull_request:
       branches:
