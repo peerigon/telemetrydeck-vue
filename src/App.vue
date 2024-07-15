@@ -1,19 +1,19 @@
 <script setup lang="ts">
   import { useTelemetryDeck } from './hooks';
-  const { signal, setClientUser } = useTelemetryDeck();
+  const { signal, queue, setClientUser } = useTelemetryDeck();
 
   const changeClientUserClick = () => {
     setClientUser('user' + Math.floor(Math.random() * 1000));
   };
 
   const buttonSignalClick = () => {
-    signal('example_event_name', {
+    signal('example_signal_event_name', {
       custom_data: 'other_data',
       timestamp: new Date().toISOString(),
     });
   };
   const buttonQueueClick = () => {
-    signal('example_event_name', {
+    queue('example_queue_event_name', {
       custom_data: 'other_data',
       timestamp: new Date().toISOString(),
     });
@@ -24,9 +24,9 @@
     <a href="https://vitejs.dev" target="_blank">
       <img src="/vite.svg" class="logo" alt="Vite logo" />
     </a>
-    <button @click="buttonSignalClick">Log a click with signal</button>
-    <button @click="buttonQueueClick">Log a click with queue</button>
-    <button @click="changeClientUserClick">Change user</button>
+    <button id="btnSignalClick" @click="buttonSignalClick">Log a click with signal</button>
+    <button id="btnQueueClick" @click="buttonQueueClick">Log a click with queue</button>
+    <button id="btnSetClient" @click="changeClientUserClick">Change user</button>
   </div>
   
 </template>

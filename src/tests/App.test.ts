@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import App from '../App.vue';
+import { LIB_VERSION } from '../version';
 
 const mockTelemetryDeck = {
   clientUser: '',
@@ -13,15 +14,33 @@ vi.mock('@telemetrydeck/sdk', () => ({
   default: () => mockTelemetryDeck,
 }));
 
-describe('MyComponent', () => {
+describe('App', () => {
   beforeEach(() => {
     // Reset mock functions before each test
     mockTelemetryDeck.signal.mockClear();
     mockTelemetryDeck.queue.mockClear();
-    mockTelemetryDeck.clientUser = '';
+    mockTelemetryDeck.clientUser = 'test-user';
   });
 
-  it('renders the component and buttons work', async () => {
+  it('renders the App and test buttons exist', async () => {
+    const wrapper = mount(App);
+
+    // Check if the component is rendered
+    expect(wrapper.find('a').attributes('href')).toBe('https://vitejs.dev');
+    expect(wrapper.find('.logo').exists()).toBe(true);
+
+    const signalClickButton = wrapper.find('#btnSignalClick');
+    const queueClickButton = wrapper.find('#btnQueueClick');
+    const setClientUserButton = wrapper.find('#btnSetClient');
+    expect(signalClickButton.exists()).toBe(true);
+    expect(queueClickButton.exists()).toBe(true);
+    expect(setClientUserButton.exists()).toBe(true);
+    expect(signalClickButton.text()).toBe('Log a click with signal');
+    expect(queueClickButton.text()).toBe('Log a click with queue');
+    expect(setClientUserButton.text()).toBe('Change user');
+  });
+
+  it('useTelementryDeck hook calls Telementry Deck correctly', async () => {
     const wrapper = mount(App, {
       global: {
         provide: {
@@ -30,20 +49,26 @@ describe('MyComponent', () => {
       },
     });
 
-    // Check if the component is rendered
-    expect(wrapper.find('a').attributes('href')).toBe('https://vitejs.dev');
-    expect(wrapper.find('.logo').exists()).toBe(true);
-
     // Test button click event for buttonSignalClick
-    await wrapper.find('button').trigger('click');
+    await wrapper.find('#btnSignalClick').trigger('click');
     expect(mockTelemetryDeck.signal).toHaveBeenCalledTimes(1);
+    expect(mockTelemetryDeck.signal).toHaveBeenCalledWith('example_signal_event_name', { tdVueVersion: LIB_VERSION, custom_data: 'other_data', timestamp: expect.any(String) }, undefined);
 
     // Test button click event for buttonQueueClick
-    await wrapper.find('button:nth-of-type(2)').trigger('click');
-    expect(mockTelemetryDeck.signal).toHaveBeenCalledTimes(2);
+    await wrapper.find('#btnQueueClick').trigger('click');
+    expect(mockTelemetryDeck.queue).toHaveBeenCalledTimes(1);
+    expect(mockTelemetryDeck.queue).toHaveBeenCalledWith('example_queue_event_name', { tdVueVersion: LIB_VERSION, custom_data: 'other_data', timestamp: expect.any(String) }, undefined);
 
     // Test button click event for changeClientUserClick
-    await wrapper.find('button:nth-of-type(3)').trigger('click');
+    let prevClientUser = mockTelemetryDeck.clientUser;
+    await wrapper.find('#btnSetClient').trigger('click');
     expect(mockTelemetryDeck.clientUser).not.toBe('');
+    expect(mockTelemetryDeck.clientUser).not.toBe(prevClientUser); // check client user has changed
+
+    // update user again
+    prevClientUser = mockTelemetryDeck.clientUser;
+    await wrapper.find('#btnSetClient').trigger('click');
+    expect(mockTelemetryDeck.clientUser).not.toBe('');
+    expect(mockTelemetryDeck.clientUser).not.toBe(prevClientUser); // check client user has changed
   });
 });
