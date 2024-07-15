@@ -19,7 +19,7 @@
     });
   };
   const buttonSignalClickWithOptions = () => {
-    signal('example_signal_event_name', {
+    signal('example_signal_event_name_with_options', {
       custom_data: 'other_data',
       timestamp: new Date().toISOString(),
     }, {
@@ -30,7 +30,7 @@
   );
   };
   const buttonQueueClickWithOptions = () => {
-    queue('example_queue_event_name', {
+    queue('example_queue_event_name_with_options', {
       custom_data: 'other_data',
       timestamp: new Date().toISOString(),
     },
