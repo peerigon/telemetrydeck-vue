@@ -8,6 +8,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "dev": "vite",
+    "size": "size-limit",
     "build": "rollup -c",
     "test": "vitest",
     "lint": "eslint src",
