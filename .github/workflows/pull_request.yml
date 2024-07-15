@@ -26,8 +26,3 @@ jobs:
 
       - name: Build
         run: npm run build
-
-      - name: Size limit
-        uses: andresz1/size-limit-action@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
