@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "rollup -c",
+    "test": "vitest",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -16,13 +17,17 @@
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
+    "@types/jsdom": "^21.1.7",
     "@vitejs/plugin-vue": "^5.0.5",
+    "@vue/test-utils": "^2.4.6",
+    "jsdom": "^24.1.0",
     "rollup": "^4.18.1",
     "rollup-plugin-delete": "^2.0.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-typescript2": "^0.36.0",
     "typescript": "^5.2.2",
     "vite": "^5.3.1",
-    "vue-tsc": "^2.0.21"
+    "vitest": "^2.0.2",
+    "vue-tsc": "^2.0.26"
   }
 }

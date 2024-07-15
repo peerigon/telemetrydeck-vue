@@ -5,7 +5,7 @@ import TelementryDeckPlugin from './plugin'
 
 const app = createApp(App)
 app.use(TelementryDeckPlugin, {
-  appID: import.meta.env.VITE_TELEMENTRYDECK_APP_ID,
+  appID: import.meta.env.VITE_TELEMENTRYDECK_APP_ID || 'test-app-id',
   testMode: true,
 })
 
