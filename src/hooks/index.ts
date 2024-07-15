@@ -3,7 +3,7 @@ import type TelemetryDeck from '@telemetrydeck/sdk';
 import type { TelemetryDeckOptions, TelemetryDeckPayload } from '@telemetrydeck/sdk';
 import { LIB_VERSION } from '../version';
 
-type EnhancedPayload = TelemetryDeckPayload & { tdVueVersion: string };
+export type EnhancedPayload = TelemetryDeckPayload & { tdVueVersion: string };
 
 function enhancePayload(payload: TelemetryDeckPayload = {}): EnhancedPayload {
   return { ...payload, tdVueVersion: LIB_VERSION };
