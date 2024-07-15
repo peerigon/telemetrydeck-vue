@@ -1,5 +1,8 @@
 name: Test, lint, build
-on: [pull_request]
+on:
+    push:
+      branches:
+        - main
 jobs:
   build:
     name: Build, lint, and test on Node
@@ -26,3 +29,11 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: 🚀 Release
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+            npm install @semantic-release/changelog @semantic-release/git --ignore-scripts --no-save
+            npx semantic-release

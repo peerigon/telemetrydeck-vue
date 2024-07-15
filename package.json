@@ -1,6 +1,6 @@
 {
   "name": "telementrydeck-vue",
-  "private": true,
+  "private": false,
   "version": "0.0.0",
   "type": "module",
   "main": "dist/index.cjs",
@@ -47,6 +47,7 @@
     "rollup-plugin-delete": "^2.0.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-typescript2": "^0.36.0",
+    "semantic-release": "^24.0.0",
     "size-limit": "^11.1.4",
     "typescript": "^5.2.2",
     "typescript-eslint": "8.0.0-alpha.10",
