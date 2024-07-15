@@ -1,7 +1,6 @@
 import { mount } from '@vue/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import App from '../App.vue';
-import { LIB_VERSION } from '../version';
 
 const mockTelemetryDeck = {
   clientUser: '',
@@ -58,22 +57,22 @@ describe('App', () => {
     // Test button click event for buttonSignalClick
     await wrapper.find('#btnSignalClick').trigger('click');
     expect(mockTelemetryDeck.signal).toHaveBeenCalledTimes(1);
-    expect(mockTelemetryDeck.signal).toHaveBeenCalledWith('example_signal_event_name', { tdVueVersion: LIB_VERSION, custom_data: 'other_data', timestamp: expect.any(String) }, undefined);
+    expect(mockTelemetryDeck.signal).toHaveBeenCalledWith('example_signal_event_name', { custom_data: 'other_data', timestamp: expect.any(String) }, undefined);
 
     // Test button click event for buttonQueueClick
     await wrapper.find('#btnQueueClick').trigger('click');
     expect(mockTelemetryDeck.queue).toHaveBeenCalledTimes(1);
-    expect(mockTelemetryDeck.queue).toHaveBeenCalledWith('example_queue_event_name', { tdVueVersion: LIB_VERSION, custom_data: 'other_data', timestamp: expect.any(String) }, undefined);
+    expect(mockTelemetryDeck.queue).toHaveBeenCalledWith('example_queue_event_name', { custom_data: 'other_data', timestamp: expect.any(String) }, undefined);
 
     // Test button click event for buttonQueueClickWithOptions
     await wrapper.find('#btnQueueClickWithOptions').trigger('click');
     expect(mockTelemetryDeck.queue).toHaveBeenCalledTimes(2);
-    expect(mockTelemetryDeck.queue).toHaveBeenCalledWith('example_queue_event_name', { tdVueVersion: LIB_VERSION, custom_data: 'other_data', timestamp: expect.any(String) }, { testMode: true, clientUser: 'other_user', appID: "other_app_id" });
+    expect(mockTelemetryDeck.queue).toHaveBeenCalledWith('example_queue_event_name_with_options', { custom_data: 'other_data', timestamp: expect.any(String) }, { testMode: true, clientUser: 'other_user', appID: "other_app_id" });
 
     // Test button click event for buttonQueueClickWithOptions
     await wrapper.find('#btnSignalClickWithOptions').trigger('click');
     expect(mockTelemetryDeck.signal).toHaveBeenCalledTimes(2);
-    expect(mockTelemetryDeck.signal).toHaveBeenCalledWith('example_signal_event_name', { tdVueVersion: LIB_VERSION, custom_data: 'other_data', timestamp: expect.any(String) }, { testMode: true, clientUser: 'other_user', appID: "other_app_id" });
+    expect(mockTelemetryDeck.signal).toHaveBeenCalledWith('example_signal_event_name_with_options', { custom_data: 'other_data', timestamp: expect.any(String) }, { testMode: true, clientUser: 'other_user', appID: "other_app_id" });
 
 
     // Test button click event for changeClientUserClick

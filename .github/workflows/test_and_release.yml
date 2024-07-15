@@ -1,5 +1,8 @@
-name: Test, lint, build
-on: [pull_request]
+name: Test and 🚀 Release
+on:
+    push:
+      branches:
+        - main
 jobs:
   build:
     name: Build, lint, and test on Node
@@ -31,3 +34,11 @@ jobs:
         uses: andresz1/size-limit-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🚀 Release
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+            npm install @semantic-release/changelog @semantic-release/git --ignore-scripts --no-save
+            npx semantic-release
