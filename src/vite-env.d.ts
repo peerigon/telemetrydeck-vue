@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_TELEMENTRYDECK_APP_ID: string;
+  readonly VITE_TELEMETRYDECK_APP_ID: string;
 }
 
 interface ImportMeta {

@@ -1,11 +1,11 @@
 import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
-import TelementryDeckPlugin from './'
+import TelemetryDeckPlugin from './'
 
 const app = createApp(App)
-app.use(TelementryDeckPlugin, {
-  appID: import.meta.env.VITE_TELEMENTRYDECK_APP_ID || 'test-app-id',
+app.use(TelemetryDeckPlugin, {
+  appID: import.meta.env.VITE_TELEMETRYDECK_APP_ID || 'test-app-id',
   testMode: true,
 })
 
