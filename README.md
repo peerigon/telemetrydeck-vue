@@ -4,6 +4,8 @@ A library for using TelemetryDeck in your React app.
 
 [![semantic-release: angular](https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
 
+[![Test and 🚀 Release](https://github.com/peerigon/telemetrydeck-vue/actions/workflows/test_and_release.yml/badge.svg)](https://github.com/peerigon/telemetrydeck-vue/actions/workflows/test_and_release.yml)
+
 ## Installation
 
 ```shell
