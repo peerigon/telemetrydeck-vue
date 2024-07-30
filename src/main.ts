@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
-import TelemetryDeckPlugin from './'
+import TelemetryDeckPlugin from '../index.ts'
 
 const app = createApp(App)
 app.use(TelemetryDeckPlugin, {
