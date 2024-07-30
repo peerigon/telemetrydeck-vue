@@ -28,8 +28,18 @@ export default [
       nodeResolve(),
       commonjs(),
       typescript({
-        tsconfig: './tsconfig.build.json',
-        useTsconfigDeclarationDir: true
+        tsconfig: 'tsconfig.node.json',
+        check: false,
+        useTsconfigDeclarationDir: true,
+        tsconfigOverride: {
+          compilerOptions: {
+            sourceMap: true,
+            declaration: true,
+            declarationMap: true,
+            target: "ESNext",
+            declarationDir: "./dist/types",
+          }
+        }
       })
     ]
   }
