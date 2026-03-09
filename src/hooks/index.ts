@@ -17,6 +17,14 @@ export function useTelemetryDeck() {
   const td = inject<TelemetryDeck>('td');
   const onError = inject<TelemetryDeckErrorHandler | undefined>('tdOnError', undefined);
 
+  const handleError = (error: unknown, meta: TelemetryDeckErrorMeta) => {
+    try {
+      onError?.(error, meta);
+    } catch {
+      // Swallow handler errors to keep safe* methods from rejecting.
+    }
+  };
+
   const setClientUser = async (clientUser: string) => {
     if (td) {
       td.clientUser = clientUser;
@@ -35,7 +43,7 @@ export function useTelemetryDeck() {
     try {
       await td?.signal(type, payload, options);
     } catch (error) {
-      onError?.(error, { method: 'signal', type, payload, options });
+      handleError(error, { method: 'signal', type, payload, options });
     }
   };
 
@@ -43,7 +51,7 @@ export function useTelemetryDeck() {
     try {
       await td?.queue(type, payload, options);
     } catch (error) {
-      onError?.(error, { method: 'queue', type, payload, options });
+      handleError(error, { method: 'queue', type, payload, options });
     }
   };
 
