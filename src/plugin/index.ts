@@ -1,19 +1,33 @@
 import TelemetryDeck from "@telemetrydeck/sdk";
-import type { Plugin } from 'vue';
+import type { TelemetryDeckErrorHandler } from '../hooks';
 
-export const plugin: Plugin = {
-  install(app, options) {
-    if (!options.appID) {
+interface TelemetryDeckApp {
+  provide: (key: string, value: unknown) => void;
+}
+
+export interface TelemetryDeckPluginOptions {
+  appID: string;
+  clientUser?: string;
+  testMode?: boolean;
+  onError?: TelemetryDeckErrorHandler;
+}
+
+// Keep this as a structural plugin type to avoid `Plugin` alias mismatches across Vue type versions.
+export const plugin = {
+  install(app: TelemetryDeckApp, ...options: [TelemetryDeckPluginOptions?]) {
+    const [pluginOptions] = options;
+
+    if (!pluginOptions?.appID) {
       throw new Error('TelemetryDeck appID is required');
     }
-    const td = options.appID
 
-    ? new TelemetryDeck({
-        appID: options.appID,
-        clientUser: options.clientUser || 'guest',
-        testMode: options.testMode || false
-      })
-    : undefined;
+    const td = new TelemetryDeck({
+      appID: pluginOptions.appID,
+      clientUser: pluginOptions.clientUser || 'guest',
+      testMode: pluginOptions.testMode || false
+    });
+
     app.provide('td', td);
+    app.provide('tdOnError', pluginOptions.onError);
   },
 };
