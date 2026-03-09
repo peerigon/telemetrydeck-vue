@@ -23,7 +23,7 @@ const app = createApp(App);
 app.use(TelemetryDeckPlugin, {
   appID: "{your telemetrydeck appID}",
   testMode: true, // optional - defaults to false
-  clientUser: 'Guest', // optional - defaults to 'Guest'
+  clientUser: 'guest', // optional - defaults to 'guest'
   onError: (error, meta) => {
     console.debug('TelemetryDeck failed', meta, error);
   }, // optional
