@@ -7,7 +7,6 @@ const mockTelemetryDeck = {
   clientUser: 'test-user',
   signal: vi.fn(),
   queue: vi.fn(),
-  flush: vi.fn(),
 };
 
 const HookConsumer = defineComponent({
@@ -22,13 +21,11 @@ describe('useTelemetryDeck safe methods', () => {
   beforeEach(() => {
     mockTelemetryDeck.signal.mockReset();
     mockTelemetryDeck.queue.mockReset();
-    mockTelemetryDeck.flush.mockReset();
   });
 
   it('swallows rejected promises in safe methods and calls onError', async () => {
     const signalError = new Error('signal failed');
     const queueError = new Error('queue failed');
-    const flushError = new Error('flush failed');
     const signalPayload = { feature: 'home' };
     const queuePayload = { action: 'tap' };
     const queueOptions = { appID: 'other-app-id', clientUser: 'other-user' };
@@ -36,7 +33,6 @@ describe('useTelemetryDeck safe methods', () => {
 
     mockTelemetryDeck.signal.mockRejectedValueOnce(signalError);
     mockTelemetryDeck.queue.mockRejectedValueOnce(queueError);
-    mockTelemetryDeck.flush.mockRejectedValueOnce(flushError);
 
     const wrapper = mount(HookConsumer, {
       global: {
@@ -50,9 +46,7 @@ describe('useTelemetryDeck safe methods', () => {
 
     await expect(vm.safeSignal('ui.opened', signalPayload)).resolves.toBeUndefined();
     await expect(vm.safeQueue('button.clicked', queuePayload, queueOptions)).resolves.toBeUndefined();
-    await expect(vm.flushSafe()).resolves.toBeUndefined();
-
-    expect(onError).toHaveBeenCalledTimes(3);
+    expect(onError).toHaveBeenCalledTimes(2);
     expect(onError).toHaveBeenNthCalledWith(1, signalError, {
       method: 'signal',
       type: 'ui.opened',
@@ -65,19 +59,14 @@ describe('useTelemetryDeck safe methods', () => {
       payload: queuePayload,
       options: queueOptions,
     });
-    expect(onError).toHaveBeenNthCalledWith(3, flushError, {
-      method: 'flush',
-    });
   });
 
   it('keeps raw methods rejecting so callers can handle errors explicitly', async () => {
     const signalError = new Error('raw signal failed');
     const queueError = new Error('raw queue failed');
-    const flushError = new Error('raw flush failed');
 
     mockTelemetryDeck.signal.mockRejectedValueOnce(signalError);
     mockTelemetryDeck.queue.mockRejectedValueOnce(queueError);
-    mockTelemetryDeck.flush.mockRejectedValueOnce(flushError);
 
     const wrapper = mount(HookConsumer, {
       global: {
@@ -90,6 +79,5 @@ describe('useTelemetryDeck safe methods', () => {
 
     await expect(vm.signal('ui.opened')).rejects.toBe(signalError);
     await expect(vm.queue('button.clicked')).rejects.toBe(queueError);
-    await expect(vm.flush()).rejects.toBe(flushError);
   });
 });
