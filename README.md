@@ -23,7 +23,10 @@ const app = createApp(App);
 app.use(TelemetryDeckPlugin, {
   appID: "{your telemetrydeck appID}",
   testMode: true, // optional - defaults to false
-  clientUser: 'Guest' // optional - defaults to 'Guest'
+  clientUser: 'Guest', // optional - defaults to 'Guest'
+  onError: (error, meta) => {
+    console.debug('TelemetryDeck failed', meta, error);
+  }, // optional
 });
 
 app.mount('#app');
@@ -34,20 +37,20 @@ app.mount('#app');
 ```vue
 <script setup lang="ts">
 import { useTelemetryDeck } from "@peerigon/telemetrydeck-vue";
-const { signal, queue, setClientUser } = useTelemetryDeck();
+const { signal, queue, safeSignal, safeQueue, setClientUser } = useTelemetryDeck();
 
 const changeClientUserClick = () => {
   setClientUser('user' + Math.floor(Math.random() * 1000));
 };
 
 const buttonSignalClick = () => {
-  signal('example_signal_event_name', {
+  safeSignal('example_signal_event_name', {
     custom_data: 'other_data', // any custom data as required
   });
 };
 
 const buttonQueueClick = () => {
-  queue('example_queue_event_name', {
+  safeQueue('example_queue_event_name', {
     custom_data: 'other_data', // any custom data as required
   });
 };
@@ -87,6 +90,9 @@ const buttonQueueClickWithOptions = () => {
   </div>
 </template>
 ```
+
+`signal()` and `queue()` return promises and may reject (for example on network failures).  
+Use `safeSignal()` and `safeQueue()` for fire-and-forget analytics calls to avoid unhandled promise rejections.
 
 ## Contributions
 
