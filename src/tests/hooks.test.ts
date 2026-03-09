@@ -98,6 +98,43 @@ describe('useTelemetryDeck safe methods', () => {
     });
   });
 
+  it('still resolves safe methods when onError rejects asynchronously', async () => {
+    const signalError = new Error('signal failed');
+    const queueError = new Error('queue failed');
+    const onError = vi.fn(async () => {
+      throw new Error('onError async failed');
+    });
+
+    mockTelemetryDeck.signal.mockRejectedValueOnce(signalError);
+    mockTelemetryDeck.queue.mockRejectedValueOnce(queueError);
+
+    const wrapper = mount(HookConsumer, {
+      global: {
+        provide: {
+          td: mockTelemetryDeck,
+          tdOnError: onError,
+        },
+      },
+    });
+    const vm = wrapper.vm as unknown as ReturnType<typeof useTelemetryDeck>;
+
+    await expect(vm.safeSignal('ui.opened')).resolves.toBeUndefined();
+    await expect(vm.safeQueue('button.clicked')).resolves.toBeUndefined();
+    expect(onError).toHaveBeenCalledTimes(2);
+    expect(onError).toHaveBeenNthCalledWith(1, signalError, {
+      method: 'signal',
+      type: 'ui.opened',
+      payload: undefined,
+      options: undefined,
+    });
+    expect(onError).toHaveBeenNthCalledWith(2, queueError, {
+      method: 'queue',
+      type: 'button.clicked',
+      payload: undefined,
+      options: undefined,
+    });
+  });
+
   it('keeps raw methods rejecting so callers can handle errors explicitly', async () => {
     const signalError = new Error('raw signal failed');
     const queueError = new Error('raw queue failed');

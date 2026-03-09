@@ -11,15 +11,18 @@ export interface TelemetryDeckErrorMeta {
   options?: TelemetryDeckOptions;
 }
 
-export type TelemetryDeckErrorHandler = (error: unknown, meta: TelemetryDeckErrorMeta) => void;
+export type TelemetryDeckErrorHandler = (
+  error: unknown,
+  meta: TelemetryDeckErrorMeta,
+) => void | Promise<void>;
 
 export function useTelemetryDeck() {
   const td = inject<TelemetryDeck>('td');
   const onError = inject<TelemetryDeckErrorHandler | undefined>('tdOnError', undefined);
 
-  const handleError = (error: unknown, meta: TelemetryDeckErrorMeta) => {
+  const handleError = async (error: unknown, meta: TelemetryDeckErrorMeta) => {
     try {
-      onError?.(error, meta);
+      await onError?.(error, meta);
     } catch {
       // Swallow handler errors to keep safe* methods from rejecting.
     }
@@ -43,7 +46,7 @@ export function useTelemetryDeck() {
     try {
       await td?.signal(type, payload, options);
     } catch (error) {
-      handleError(error, { method: 'signal', type, payload, options });
+      await handleError(error, { method: 'signal', type, payload, options });
     }
   };
 
@@ -51,7 +54,7 @@ export function useTelemetryDeck() {
     try {
       await td?.queue(type, payload, options);
     } catch (error) {
-      handleError(error, { method: 'queue', type, payload, options });
+      await handleError(error, { method: 'queue', type, payload, options });
     }
   };
 
