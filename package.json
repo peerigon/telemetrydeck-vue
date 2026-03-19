@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.7.0",
-    "@peerigon/configs": "^14.9.0",
+    "@peerigon/configs": "^15.0.0",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-replace": "^5.0.7",
