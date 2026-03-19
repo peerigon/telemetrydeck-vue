@@ -9,6 +9,13 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+      packages: write
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -33,7 +40,5 @@ jobs:
       - name: 🚀 Release
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-            npm install @semantic-release/git --ignore-scripts --no-save
-            npx semantic-release
+            npm run release
