@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "allowImportingTsExtensions": false,
+    "declaration": true,
+    "declarationDir": "./dist/types",
+    "declarationMap": true,
+    "emitDeclarationOnly": false,
+    "noEmit": false,
+    "sourceMap": true,
+    "target": "ESNext"
+  },
+  "include": ["index.ts", "src/hooks/**/*.ts", "src/plugin/**/*.ts"]
+}

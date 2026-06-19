@@ -55,7 +55,7 @@
     "rollup": "^4.18.1",
     "rollup-plugin-delete": "^2.0.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",
-    "rollup-plugin-typescript2": "^0.36.0",
+    "rollup-plugin-typescript2": "^0.37.0",
     "semantic-release": "^25.0.3",
     "size-limit": "^11.1.4",
     "typescript": "^5.2.2",

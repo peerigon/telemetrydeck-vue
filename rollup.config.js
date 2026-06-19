@@ -25,10 +25,8 @@ export default [
     plugins: [
       del({ targets: 'dist/*' }),
       peerDepsExternal(),
-      nodeResolve(),
-      commonjs(),
       typescript({
-        tsconfig: 'tsconfig.node.json',
+        tsconfig: 'tsconfig.build.json',
         check: false,
         useTsconfigDeclarationDir: true,
         tsconfigOverride: {
@@ -40,7 +38,9 @@ export default [
             declarationDir: "./dist/types",
           }
         }
-      })
+      }),
+      nodeResolve(),
+      commonjs()
     ]
   }
 ];
