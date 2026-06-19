@@ -28,16 +28,7 @@ export default [
       typescript({
         tsconfig: 'tsconfig.build.json',
         check: false,
-        useTsconfigDeclarationDir: true,
-        tsconfigOverride: {
-          compilerOptions: {
-            sourceMap: true,
-            declaration: true,
-            declarationMap: true,
-            target: "ESNext",
-            declarationDir: "./dist/types",
-          }
-        }
+        useTsconfigDeclarationDir: true
       }),
       nodeResolve(),
       commonjs()

@@ -8,7 +8,8 @@
     "emitDeclarationOnly": false,
     "noEmit": false,
     "sourceMap": true,
-    "target": "ESNext"
+    "target": "ESNext",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.build.tsbuildinfo"
   },
   "include": ["index.ts", "src/hooks/**/*.ts", "src/plugin/**/*.ts"]
 }
