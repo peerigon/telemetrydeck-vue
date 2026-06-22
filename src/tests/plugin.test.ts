@@ -4,13 +4,20 @@ import { defineComponent } from 'vue';
 import { useTelemetryDeck } from '../hooks';
 import { plugin } from '../plugin';
 
-const mockTelemetryDeck = {
-  clientUser: 'test-user',
-  signal: vi.fn(),
-  queue: vi.fn(),
-};
+const { mockTelemetryDeck, telemetryDeckCtor } = vi.hoisted(() => {
+  const instance = {
+    clientUser: 'test-user',
+    signal: vi.fn(),
+    queue: vi.fn(),
+  };
 
-const telemetryDeckCtor = vi.hoisted(() => vi.fn(() => mockTelemetryDeck));
+  return {
+    mockTelemetryDeck: instance,
+    telemetryDeckCtor: vi.fn(function TelemetryDeckMock() {
+      return instance;
+    }),
+  };
+});
 
 vi.mock('@telemetrydeck/sdk', () => ({
   default: telemetryDeckCtor,
