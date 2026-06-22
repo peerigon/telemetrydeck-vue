@@ -1,5 +1,5 @@
 import TelemetryDeck from "@telemetrydeck/sdk";
-import type { TelemetryDeckErrorHandler } from '../hooks';
+import type { TelemetryDeckErrorHandler } from "../hooks";
 
 interface TelemetryDeckApp {
   provide: (key: string, value: unknown) => void;
@@ -18,16 +18,16 @@ export const plugin = {
     const [pluginOptions] = options;
 
     if (!pluginOptions?.appID) {
-      throw new Error('TelemetryDeck appID is required');
+      throw new Error("TelemetryDeck appID is required");
     }
 
     const td = new TelemetryDeck({
       appID: pluginOptions.appID,
-      clientUser: pluginOptions.clientUser || 'guest',
-      testMode: pluginOptions.testMode || false
+      clientUser: pluginOptions.clientUser || "guest",
+      testMode: pluginOptions.testMode || false,
     });
 
-    app.provide('td', td);
-    app.provide('tdOnError', pluginOptions.onError);
+    app.provide("td", td);
+    app.provide("tdOnError", pluginOptions.onError);
   },
 };

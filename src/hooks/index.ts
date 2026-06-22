@@ -1,8 +1,11 @@
-import { inject } from 'vue';
-import type TelemetryDeck from '@telemetrydeck/sdk';
-import type { TelemetryDeckOptions, TelemetryDeckPayload } from '@telemetrydeck/sdk';
+import type TelemetryDeck from "@telemetrydeck/sdk";
+import type {
+  TelemetryDeckOptions,
+  TelemetryDeckPayload,
+} from "@telemetrydeck/sdk";
+import { inject } from "vue";
 
-export type TelemetryDeckMethod = 'signal' | 'queue' | 'flush';
+export type TelemetryDeckMethod = "signal" | "queue" | "flush";
 
 export interface TelemetryDeckErrorMeta {
   method: TelemetryDeckMethod;
@@ -17,8 +20,11 @@ export type TelemetryDeckErrorHandler = (
 ) => void | Promise<void>;
 
 export function useTelemetryDeck() {
-  const td = inject<TelemetryDeck>('td');
-  const onError = inject<TelemetryDeckErrorHandler | undefined>('tdOnError', undefined);
+  const td = inject<TelemetryDeck>("td");
+  const onError = inject<TelemetryDeckErrorHandler | undefined>(
+    "tdOnError",
+    undefined,
+  );
 
   const handleError = async (error: unknown, meta: TelemetryDeckErrorMeta) => {
     try {
@@ -34,11 +40,19 @@ export function useTelemetryDeck() {
     }
   };
 
-  const signal = async (type: string, payload?: TelemetryDeckPayload, options?: TelemetryDeckOptions) => {
+  const signal = async (
+    type: string,
+    payload?: TelemetryDeckPayload,
+    options?: TelemetryDeckOptions,
+  ) => {
     return td?.signal(type, payload, options);
   };
 
-  const queue = async (type: string, payload?: TelemetryDeckPayload, options?: TelemetryDeckOptions) => {
+  const queue = async (
+    type: string,
+    payload?: TelemetryDeckPayload,
+    options?: TelemetryDeckOptions,
+  ) => {
     return td?.queue(type, payload, options);
   };
 
@@ -46,19 +60,27 @@ export function useTelemetryDeck() {
     return td?.flush();
   };
 
-  const safeSignal = async (type: string, payload?: TelemetryDeckPayload, options?: TelemetryDeckOptions) => {
+  const safeSignal = async (
+    type: string,
+    payload?: TelemetryDeckPayload,
+    options?: TelemetryDeckOptions,
+  ) => {
     try {
       await td?.signal(type, payload, options);
     } catch (error) {
-      await handleError(error, { method: 'signal', type, payload, options });
+      await handleError(error, { method: "signal", type, payload, options });
     }
   };
 
-  const safeQueue = async (type: string, payload?: TelemetryDeckPayload, options?: TelemetryDeckOptions) => {
+  const safeQueue = async (
+    type: string,
+    payload?: TelemetryDeckPayload,
+    options?: TelemetryDeckOptions,
+  ) => {
     try {
       await td?.queue(type, payload, options);
     } catch (error) {
-      await handleError(error, { method: 'queue', type, payload, options });
+      await handleError(error, { method: "queue", type, payload, options });
     }
   };
 
@@ -66,7 +88,7 @@ export function useTelemetryDeck() {
     try {
       await td?.flush();
     } catch (error) {
-      await handleError(error, { method: 'flush' });
+      await handleError(error, { method: "flush" });
     }
   };
 

@@ -1,11 +1,10 @@
-import { mount } from '@vue/test-utils';
-import { nextTick } from 'vue';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-import App from '../App.vue';
+import { mount } from "@vue/test-utils";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { nextTick } from "vue";
+import App from "../App.vue";
 
 const mockTelemetryDeck = {
-  clientUser: '',
+  clientUser: "",
   signal: vi.fn(),
   queue: vi.fn(),
   flush: vi.fn(),
@@ -26,34 +25,34 @@ const mountApp = () => {
   });
 };
 
-describe('App', () => {
+describe("App", () => {
   beforeEach(() => {
     mockTelemetryDeck.signal.mockReset();
     mockTelemetryDeck.queue.mockReset();
     mockTelemetryDeck.flush.mockReset();
-    mockTelemetryDeck.clientUser = 'test-user';
+    mockTelemetryDeck.clientUser = "test-user";
   });
 
-  it('renders the demo controls', () => {
+  it("renders the demo controls", () => {
     const wrapper = mountApp();
 
-    expect(wrapper.find('h1').text()).toBe('Demo controls');
-    expect(wrapper.find('#queuedTelemetryEvents').text()).toBe('0');
-    expect(wrapper.find('#lastTelemetryAction').text()).toBe('');
-    expect(wrapper.find('#lastTelemetryResult').text()).toBe('');
-    expect(wrapper.find('#lastTelemetryError').text()).toBe('');
+    expect(wrapper.find("h1").text()).toBe("Demo controls");
+    expect(wrapper.find("#queuedTelemetryEvents").text()).toBe("0");
+    expect(wrapper.find("#lastTelemetryAction").text()).toBe("");
+    expect(wrapper.find("#lastTelemetryResult").text()).toBe("");
+    expect(wrapper.find("#lastTelemetryError").text()).toBe("");
 
     const buttons = [
-      ['#btnSignalClick', 'Send signal'],
-      ['#btnSignalClickWithOptions', 'Send signal with options'],
-      ['#btnQueueClick', 'Queue event'],
-      ['#btnQueueClickWithOptions', 'Queue event with options'],
-      ['#btnFlushClick', 'Flush queue'],
-      ['#btnSafeSignalClick', 'Safe signal'],
-      ['#btnSafeQueueClick', 'Safe queue'],
-      ['#btnSafeFlushClick', 'Safe flush'],
-      ['#btnSetClient', 'Change user'],
-      ['#btnClearStatus', 'Clear last action'],
+      ["#btnSignalClick", "Send signal"],
+      ["#btnSignalClickWithOptions", "Send signal with options"],
+      ["#btnQueueClick", "Queue event"],
+      ["#btnQueueClickWithOptions", "Queue event with options"],
+      ["#btnFlushClick", "Flush queue"],
+      ["#btnSafeSignalClick", "Safe signal"],
+      ["#btnSafeQueueClick", "Safe queue"],
+      ["#btnSafeFlushClick", "Safe flush"],
+      ["#btnSetClient", "Change user"],
+      ["#btnClearStatus", "Clear last action"],
     ];
 
     for (const [selector, label] of buttons) {
@@ -63,142 +62,162 @@ describe('App', () => {
     }
   });
 
-  it('calls TelemetryDeck methods from the demo controls', async () => {
+  it("calls TelemetryDeck methods from the demo controls", async () => {
     const wrapper = mountApp();
 
     mockTelemetryDeck.signal.mockResolvedValueOnce({ accepted: true });
 
-    await wrapper.find('#btnSignalClick').trigger('click');
+    await wrapper.find("#btnSignalClick").trigger("click");
     await waitForClickHandler();
     expect(mockTelemetryDeck.signal).toHaveBeenCalledWith(
-      'example_signal_event_name',
+      "example_signal_event_name",
       expect.objectContaining({
-        custom_data: 'other_data',
-        source: 'signal',
+        custom_data: "other_data",
+        source: "signal",
         timestamp: expect.any(String),
       }),
       undefined,
     );
-    expect(wrapper.find('#lastTelemetryResult').text()).toBe('signal response: {"accepted":true}');
+    expect(wrapper.find("#lastTelemetryResult").text()).toBe(
+      'signal response: {"accepted":true}',
+    );
 
-    await wrapper.find('#btnQueueClick').trigger('click');
+    await wrapper.find("#btnQueueClick").trigger("click");
     await waitForClickHandler();
     expect(mockTelemetryDeck.queue).toHaveBeenCalledWith(
-      'example_queue_event_name',
+      "example_queue_event_name",
       expect.objectContaining({
-        custom_data: 'other_data',
-        source: 'queue',
+        custom_data: "other_data",
+        source: "queue",
         timestamp: expect.any(String),
       }),
       undefined,
     );
-    expect(wrapper.find('#lastTelemetryResult').text()).toBe('queue promise resolved without response');
-    expect(wrapper.find('#queuedTelemetryEvents').text()).toBe('1');
+    expect(wrapper.find("#lastTelemetryResult").text()).toBe(
+      "queue promise resolved without response",
+    );
+    expect(wrapper.find("#queuedTelemetryEvents").text()).toBe("1");
 
-    await wrapper.find('#btnQueueClickWithOptions').trigger('click');
+    await wrapper.find("#btnQueueClickWithOptions").trigger("click");
     await waitForClickHandler();
     expect(mockTelemetryDeck.queue).toHaveBeenCalledWith(
-      'example_queue_event_name_with_options',
+      "example_queue_event_name_with_options",
       expect.objectContaining({
-        custom_data: 'other_data',
-        source: 'queue_with_options',
+        custom_data: "other_data",
+        source: "queue_with_options",
         timestamp: expect.any(String),
       }),
-      { testMode: true, clientUser: 'other_user', appID: 'other_app_id' },
+      { testMode: true, clientUser: "other_user", appID: "other_app_id" },
     );
 
-    await wrapper.find('#btnSignalClickWithOptions').trigger('click');
+    await wrapper.find("#btnSignalClickWithOptions").trigger("click");
     await waitForClickHandler();
     expect(mockTelemetryDeck.signal).toHaveBeenCalledWith(
-      'example_signal_event_name_with_options',
+      "example_signal_event_name_with_options",
       expect.objectContaining({
-        custom_data: 'other_data',
-        source: 'signal_with_options',
+        custom_data: "other_data",
+        source: "signal_with_options",
         timestamp: expect.any(String),
       }),
-      { testMode: true, clientUser: 'other_user', appID: 'other_app_id' },
+      { testMode: true, clientUser: "other_user", appID: "other_app_id" },
     );
 
-    await wrapper.find('#btnFlushClick').trigger('click');
+    await wrapper.find("#btnFlushClick").trigger("click");
     await waitForClickHandler();
     expect(mockTelemetryDeck.flush).toHaveBeenCalledTimes(1);
-    expect(wrapper.find('#lastTelemetryResult').text()).toBe('flush promise resolved without response');
-    expect(wrapper.find('#queuedTelemetryEvents').text()).toBe('0');
+    expect(wrapper.find("#lastTelemetryResult").text()).toBe(
+      "flush promise resolved without response",
+    );
+    expect(wrapper.find("#queuedTelemetryEvents").text()).toBe("0");
 
-    await wrapper.find('#btnSafeSignalClick').trigger('click');
+    await wrapper.find("#btnSafeSignalClick").trigger("click");
     await waitForClickHandler();
     expect(mockTelemetryDeck.signal).toHaveBeenCalledWith(
-      'example_safe_signal_event_name',
+      "example_safe_signal_event_name",
       expect.objectContaining({
-        source: 'safe_signal',
+        source: "safe_signal",
       }),
       undefined,
     );
-    expect(wrapper.find('#lastTelemetryResult').text()).toBe('safeSignal promise resolved');
+    expect(wrapper.find("#lastTelemetryResult").text()).toBe(
+      "safeSignal promise resolved",
+    );
 
-    await wrapper.find('#btnSafeQueueClick').trigger('click');
+    await wrapper.find("#btnSafeQueueClick").trigger("click");
     await waitForClickHandler();
     expect(mockTelemetryDeck.queue).toHaveBeenCalledWith(
-      'example_safe_queue_event_name',
+      "example_safe_queue_event_name",
       expect.objectContaining({
-        source: 'safe_queue',
+        source: "safe_queue",
       }),
       undefined,
     );
-    expect(wrapper.find('#lastTelemetryResult').text()).toBe('safeQueue promise resolved');
-    expect(wrapper.find('#queuedTelemetryEvents').text()).toBe('0');
+    expect(wrapper.find("#lastTelemetryResult").text()).toBe(
+      "safeQueue promise resolved",
+    );
+    expect(wrapper.find("#queuedTelemetryEvents").text()).toBe("0");
 
-    await wrapper.find('#btnSafeFlushClick').trigger('click');
+    await wrapper.find("#btnSafeFlushClick").trigger("click");
     await waitForClickHandler();
     expect(mockTelemetryDeck.flush).toHaveBeenCalledTimes(2);
-    expect(wrapper.find('#lastTelemetryResult').text()).toBe('safeFlush promise resolved');
-    expect(wrapper.find('#queuedTelemetryEvents').text()).toBe('0');
+    expect(wrapper.find("#lastTelemetryResult").text()).toBe(
+      "safeFlush promise resolved",
+    );
+    expect(wrapper.find("#queuedTelemetryEvents").text()).toBe("0");
 
     let previousClientUser = mockTelemetryDeck.clientUser;
-    await wrapper.find('#btnSetClient').trigger('click');
+    await wrapper.find("#btnSetClient").trigger("click");
     await waitForClickHandler();
-    expect(mockTelemetryDeck.clientUser).not.toBe('');
+    expect(mockTelemetryDeck.clientUser).not.toBe("");
     expect(mockTelemetryDeck.clientUser).not.toBe(previousClientUser);
 
     previousClientUser = mockTelemetryDeck.clientUser;
-    await wrapper.find('#btnSetClient').trigger('click');
+    await wrapper.find("#btnSetClient").trigger("click");
     await waitForClickHandler();
-    expect(mockTelemetryDeck.clientUser).not.toBe('');
+    expect(mockTelemetryDeck.clientUser).not.toBe("");
     expect(mockTelemetryDeck.clientUser).not.toBe(previousClientUser);
-    expect(wrapper.find('#lastTelemetryResult').text()).toBe('setClientUser completed');
+    expect(wrapper.find("#lastTelemetryResult").text()).toBe(
+      "setClientUser completed",
+    );
   });
 
-  it('displays TelemetryDeck errors captured by the demo onError handler', async () => {
+  it("displays TelemetryDeck errors captured by the demo onError handler", async () => {
     const wrapper = mountApp();
 
-    window.dispatchEvent(new CustomEvent('telemetrydeck:error', {
-      detail: {
-        message: 'network failed',
-        meta: {
-          method: 'flush',
+    window.dispatchEvent(
+      new CustomEvent("telemetrydeck:error", {
+        detail: {
+          message: "network failed",
+          meta: {
+            method: "flush",
+          },
         },
-      },
-    }));
+      }),
+    );
     await nextTick();
 
-    expect(wrapper.find('#lastTelemetryError').text()).toBe('flush failed: network failed');
+    expect(wrapper.find("#lastTelemetryError").text()).toBe(
+      "flush failed: network failed",
+    );
   });
 
-  it('displays raw method promise rejections', async () => {
-    mockTelemetryDeck.flush.mockRejectedValueOnce(new Error('flush failed'));
+  it("displays raw method promise rejections", async () => {
+    mockTelemetryDeck.flush.mockRejectedValueOnce(new Error("flush failed"));
     const wrapper = mountApp();
 
-    await wrapper.find('#btnFlushClick').trigger('click');
+    await wrapper.find("#btnFlushClick").trigger("click");
     await waitForClickHandler();
 
-    expect(wrapper.find('#lastTelemetryResult').text()).toBe('flush rejected');
-    expect(wrapper.find('#lastTelemetryError').text()).toBe('flush failed: flush failed');
+    expect(wrapper.find("#lastTelemetryResult").text()).toBe("flush rejected");
+    expect(wrapper.find("#lastTelemetryError").text()).toBe(
+      "flush failed: flush failed",
+    );
 
-    await wrapper.find('#btnClearStatus').trigger('click');
+    await wrapper.find("#btnClearStatus").trigger("click");
     await nextTick();
 
-    expect(wrapper.find('#lastTelemetryAction').text()).toBe('');
-    expect(wrapper.find('#lastTelemetryResult').text()).toBe('');
-    expect(wrapper.find('#lastTelemetryError').text()).toBe('');
+    expect(wrapper.find("#lastTelemetryAction").text()).toBe("");
+    expect(wrapper.find("#lastTelemetryResult").text()).toBe("");
+    expect(wrapper.find("#lastTelemetryError").text()).toBe("");
   });
 });

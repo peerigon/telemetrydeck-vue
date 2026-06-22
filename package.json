@@ -1,11 +1,12 @@
 {
   "name": "@peerigon/telemetrydeck-vue",
-  "private": false,
   "version": "0.0.0-semantically-released",
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/peerigon/telemetrydeck-vue.git"
+  },
   "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
@@ -14,38 +15,30 @@
       "default": "./dist/index.mjs"
     }
   },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
-    "dev": "vite",
-    "size": "size-limit",
     "build": "rollup -c",
     "postbuild": "npm run test:exports",
+    "dev": "vite",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint src",
     "prepack": "npm run build",
+    "preview": "vite preview",
+    "release": "semantic-release",
+    "size": "size-limit",
     "test": "vitest --coverage",
     "test:exports": "node tests/exports/import.mjs && node tests/exports/require.cjs",
-    "typecheck": "vue-tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.build.json",
-    "lint": "eslint src",
-    "preview": "vite preview",
-    "release": "semantic-release"
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.build.json"
   },
-  "size-limit": [
-    {
-      "path": "dist/index.mjs",
-      "limit": "10 kB"
-    },
-    {
-      "path": "dist/index.cjs",
-      "limit": "10 kB"
-    }
-  ],
   "dependencies": {
     "@telemetrydeck/sdk": "^2.0.4"
-  },
-  "peerDependencies": {
-    "vue": "^3.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/peerigon/telemetrydeck-vue.git"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
@@ -65,6 +58,7 @@
     "eslint-plugin-vue": "^10.9.2",
     "globals": "^17.6.0",
     "jsdom": "^29.1.1",
+    "prettier": "^3.8.4",
     "rollup": "^4.18.1",
     "rollup-plugin-delete": "^3.0.2",
     "rollup-plugin-peer-deps-external": "^2.2.4",
@@ -79,12 +73,21 @@
     "vue-eslint-parser": "^10.4.1",
     "vue-tsc": "^3.3.5"
   },
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  },
   "publishConfig": {
     "access": "public",
     "provenance": true
   },
-  "files": [
-    "dist",
-    "README.md"
+  "size-limit": [
+    {
+      "path": "dist/index.mjs",
+      "limit": "10 kB"
+    },
+    {
+      "path": "dist/index.cjs",
+      "limit": "10 kB"
+    }
   ]
 }

@@ -17,20 +17,20 @@ npm i @peerigon/telemetrydeck-vue --save
 Set up the plugin in your application setup:
 
 ```javascript
-import { createApp } from 'vue';
-import TelemetryDeckPlugin from '@peerigon/telemetrydeck-vue';
+import TelemetryDeckPlugin from "@peerigon/telemetrydeck-vue";
+import { createApp } from "vue";
 
 const app = createApp(App);
 app.use(TelemetryDeckPlugin, {
   appID: "{your telemetrydeck appID}",
   testMode: true, // optional - defaults to false
-  clientUser: 'guest', // optional - defaults to 'guest'
+  clientUser: "guest", // optional - defaults to 'guest'
   onError: (error, meta) => {
-    console.debug('TelemetryDeck failed', meta, error);
+    console.debug("TelemetryDeck failed", meta, error);
   }, // optional
 });
 
-app.mount('#app');
+app.mount("#app");
 ```
 
 ## Basic Usage
@@ -38,55 +38,81 @@ app.mount('#app');
 ```vue
 <script setup lang="ts">
 import { useTelemetryDeck } from "@peerigon/telemetrydeck-vue";
-const { signal, queue, safeSignal, safeQueue, setClientUser } = useTelemetryDeck();
+
+const { signal, queue, safeSignal, safeQueue, setClientUser } =
+  useTelemetryDeck();
 
 const changeClientUserClick = () => {
-  setClientUser('user' + Math.floor(Math.random() * 1000));
+  setClientUser("user" + Math.floor(Math.random() * 1000));
 };
 
 const buttonSignalClick = () => {
-  safeSignal('example_signal_event_name', {
-    custom_data: 'other_data', // any custom data as required
+  safeSignal("example_signal_event_name", {
+    custom_data: "other_data", // any custom data as required
   });
 };
 
 const buttonQueueClick = () => {
-  safeQueue('example_queue_event_name', {
-    custom_data: 'other_data', // any custom data as required
+  safeQueue("example_queue_event_name", {
+    custom_data: "other_data", // any custom data as required
   });
 };
 
 const buttonSignalClickWithOptions = () => {
-  signal('example_signal_event_name_with_options', {
-    custom_data: 'other_data', // any custom data as required
-  }, {
-    testMode: true,
-    clientUser: 'other_user',
-    appID: 'other_app_id',
-  }); // telemetryDeck options (optional)
+  signal(
+    "example_signal_event_name_with_options",
+    {
+      custom_data: "other_data", // any custom data as required
+    },
+    {
+      testMode: true,
+      clientUser: "other_user",
+      appID: "other_app_id",
+    },
+  ); // telemetryDeck options (optional)
 };
 
 const buttonQueueClickWithOptions = () => {
-  queue('example_queue_event_name_with_options', {
-    custom_data: 'other_data', // any custom data as required
-  }, {
-    testMode: true,
-    clientUser: 'other_user',
-    appID: 'other_app_id',
-  }); // telemetryDeck options (optional)
+  queue(
+    "example_queue_event_name_with_options",
+    {
+      custom_data: "other_data", // any custom data as required
+    },
+    {
+      testMode: true,
+      clientUser: "other_user",
+      appID: "other_app_id",
+    },
+  ); // telemetryDeck options (optional)
 };
 </script>
 
 <template>
   <div>
     <div>
-      <button id="btnSignalClick" @click="buttonSignalClick">Log a click with signal</button>
-      <button id="btnQueueClick" @click="buttonQueueClick">Log a click with queue</button>
-      <button id="btnSetClient" @click="changeClientUserClick">Change user</button>
+      <button id="btnSignalClick" @click="buttonSignalClick">
+        Log a click with signal
+      </button>
+      <button id="btnQueueClick" @click="buttonQueueClick">
+        Log a click with queue
+      </button>
+      <button id="btnSetClient" @click="changeClientUserClick">
+        Change user
+      </button>
     </div>
     <div>
-      <button id="btnSignalClickWithOptions" @click="buttonSignalClickWithOptions">Log a click with signal with Options</button>
-      <button id="btnQueueClickWithOptions" @click="buttonQueueClickWithOptions">Log a click with queue with Options</button>
+      <button
+        id="btnSignalClickWithOptions"
+        @click="buttonSignalClickWithOptions"
+      >
+        Log a click with signal with Options
+      </button>
+      <button
+        id="btnQueueClickWithOptions"
+        @click="buttonQueueClickWithOptions"
+      >
+        Log a click with queue with Options
+      </button>
     </div>
   </div>
 </template>
@@ -124,4 +150,18 @@ Run the tests with:
 
 ```shell
 npm run test
+```
+
+### Formatting
+
+Format the project with:
+
+```shell
+npm run format
+```
+
+Check formatting without writing changes with:
+
+```shell
+npm run format:check
 ```

@@ -1,16 +1,25 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
-
-import { useTelemetryDeck } from "../index.ts";
-import type { TelemetryDeckErrorMeta, TelemetryDeckMethod } from "../index.ts";
+import {
+  useTelemetryDeck,
+  type TelemetryDeckErrorMeta,
+  type TelemetryDeckMethod,
+} from "../index.ts";
 
 interface TelemetryDeckErrorEventDetail {
   message: string;
   meta: TelemetryDeckErrorMeta;
 }
 
-const { signal, queue, flush, safeSignal, safeQueue, safeFlush, setClientUser } =
-  useTelemetryDeck();
+const {
+  signal,
+  queue,
+  flush,
+  safeSignal,
+  safeQueue,
+  safeFlush,
+  setClientUser,
+} = useTelemetryDeck();
 
 const currentClientUser = ref("guest");
 const queuedEvents = ref(0);
@@ -74,11 +83,12 @@ const buttonQueueClickWithOptions = async () => {
   await runRawAction(
     "queue",
     "Event with options added to the queue",
-    () => queue(
-      "example_queue_event_name_with_options",
-      payload("queue_with_options"),
-      options,
-    ),
+    () =>
+      queue(
+        "example_queue_event_name_with_options",
+        payload("queue_with_options"),
+        options,
+      ),
     () => {
       queuedEvents.value += 1;
     },
@@ -86,14 +96,9 @@ const buttonQueueClickWithOptions = async () => {
 };
 
 const buttonFlushClick = async () => {
-  await runRawAction(
-    "flush",
-    "Queued events flushed",
-    flush,
-    () => {
-      queuedEvents.value = 0;
-    },
-  );
+  await runRawAction("flush", "Queued events flushed", flush, () => {
+    queuedEvents.value = 0;
+  });
 };
 
 const buttonSafeSignalClick = async () => {
@@ -103,19 +108,13 @@ const buttonSafeSignalClick = async () => {
 };
 
 const buttonSafeQueueClick = async () => {
-  await runSafeAction(
-    "safeQueue",
-    "Safe queue completed",
-    () => safeQueue("example_safe_queue_event_name", payload("safe_queue")),
+  await runSafeAction("safeQueue", "Safe queue completed", () =>
+    safeQueue("example_safe_queue_event_name", payload("safe_queue")),
   );
 };
 
 const buttonSafeFlushClick = async () => {
-  await runSafeAction(
-    "safeFlush",
-    "Safe flush completed",
-    safeFlush,
-  );
+  await runSafeAction("safeFlush", "Safe flush completed", safeFlush);
 };
 
 const runRawAction = async (
@@ -152,7 +151,10 @@ const getErrorMessage = (error: unknown) => {
   return error instanceof Error ? error.message : String(error);
 };
 
-const formatResolvedResult = (method: TelemetryDeckMethod, response: unknown) => {
+const formatResolvedResult = (
+  method: TelemetryDeckMethod,
+  response: unknown,
+) => {
   if (response === undefined) {
     return `${method} promise resolved without response`;
   }
@@ -173,7 +175,9 @@ const formatErrorMeta = (meta: TelemetryDeckErrorMeta) => {
 };
 
 const handleTelemetryDeckError = (event: Event) => {
-  const { message, meta } = (event as CustomEvent<TelemetryDeckErrorEventDetail>).detail;
+  const { message, meta } = (
+    event as CustomEvent<TelemetryDeckErrorEventDetail>
+  ).detail;
   lastError.value = `${formatErrorMeta(meta)} failed: ${message}`;
 };
 
@@ -215,7 +219,12 @@ onUnmounted(() => {
           <dd id="lastTelemetryError">{{ lastError }}</dd>
         </div>
       </dl>
-      <button id="btnClearStatus" class="clear-action" type="button" @click="clearStatusClick">
+      <button
+        id="btnClearStatus"
+        class="clear-action"
+        type="button"
+        @click="clearStatusClick"
+      >
         Clear last action
       </button>
     </header>
@@ -226,7 +235,12 @@ onUnmounted(() => {
         <h2 id="send-now-title">Signal</h2>
       </div>
       <div class="button-grid">
-        <button id="btnSignalClick" class="primary-action" type="button" @click="buttonSignalClick">
+        <button
+          id="btnSignalClick"
+          class="primary-action"
+          type="button"
+          @click="buttonSignalClick"
+        >
           Send signal
         </button>
         <button
@@ -246,7 +260,12 @@ onUnmounted(() => {
         <h2 id="queue-title">Queue and flush</h2>
       </div>
       <div class="button-grid">
-        <button id="btnQueueClick" class="queue-action" type="button" @click="buttonQueueClick">
+        <button
+          id="btnQueueClick"
+          class="queue-action"
+          type="button"
+          @click="buttonQueueClick"
+        >
           Queue event
         </button>
         <button
@@ -257,7 +276,12 @@ onUnmounted(() => {
         >
           Queue event with options
         </button>
-        <button id="btnFlushClick" class="flush-action" type="button" @click="buttonFlushClick">
+        <button
+          id="btnFlushClick"
+          class="flush-action"
+          type="button"
+          @click="buttonFlushClick"
+        >
           Flush queue
         </button>
       </div>
@@ -269,13 +293,28 @@ onUnmounted(() => {
         <h2 id="safe-title">Safe wrappers</h2>
       </div>
       <div class="button-grid">
-        <button id="btnSafeSignalClick" class="safe-action" type="button" @click="buttonSafeSignalClick">
+        <button
+          id="btnSafeSignalClick"
+          class="safe-action"
+          type="button"
+          @click="buttonSafeSignalClick"
+        >
           Safe signal
         </button>
-        <button id="btnSafeQueueClick" class="safe-action" type="button" @click="buttonSafeQueueClick">
+        <button
+          id="btnSafeQueueClick"
+          class="safe-action"
+          type="button"
+          @click="buttonSafeQueueClick"
+        >
           Safe queue
         </button>
-        <button id="btnSafeFlushClick" class="safe-action" type="button" @click="buttonSafeFlushClick">
+        <button
+          id="btnSafeFlushClick"
+          class="safe-action"
+          type="button"
+          @click="buttonSafeFlushClick"
+        >
           Safe flush
         </button>
       </div>
@@ -286,7 +325,12 @@ onUnmounted(() => {
         <p class="section-kicker">User state</p>
         <h2 id="user-title">Client user</h2>
       </div>
-      <button id="btnSetClient" class="user-action" type="button" @click="changeClientUserClick">
+      <button
+        id="btnSetClient"
+        class="user-action"
+        type="button"
+        @click="changeClientUserClick"
+      >
         Change user
       </button>
     </section>
@@ -303,9 +347,9 @@ onUnmounted(() => {
 .demo-header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(320px, 460px);
-  gap: 32px;
   align-items: end;
   padding-bottom: 32px;
+  gap: 32px;
   border-bottom: 1px solid #d8dee8;
 }
 
@@ -313,8 +357,8 @@ onUnmounted(() => {
 .section-kicker {
   margin: 0 0 8px;
   color: #4a6a58;
-  font-size: 0.78rem;
   font-weight: 700;
+  font-size: 0.78rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -337,8 +381,8 @@ h2 {
 .status-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
   margin: 0;
+  gap: 12px;
 }
 
 .status-list div {
@@ -363,32 +407,32 @@ h2 {
   width: auto;
   min-height: 40px;
   padding: 8px 14px;
+  border-color: #c4ccd8;
   background: #ffffff;
   color: #3e4f68;
-  border-color: #c4ccd8;
   font-weight: 800;
 }
 
 dt {
   color: #637087;
-  font-size: 0.78rem;
   font-weight: 700;
+  font-size: 0.78rem;
   text-transform: uppercase;
 }
 
 dd {
   margin: 4px 0 0;
-  overflow-wrap: anywhere;
   color: #162033;
   font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
 .demo-section {
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
-  gap: 24px;
   align-items: start;
   padding: 28px 0;
+  gap: 24px;
   border-bottom: 1px solid #d8dee8;
 }
 
@@ -399,11 +443,11 @@ dd {
 }
 
 button {
-  min-height: 56px;
   width: 100%;
+  min-height: 56px;
+  padding: 12px 16px;
   border: 1px solid transparent;
   border-radius: 8px;
-  padding: 12px 16px;
   color: #ffffff;
   font: inherit;
   font-weight: 800;
