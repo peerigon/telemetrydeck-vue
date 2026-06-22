@@ -4,7 +4,7 @@ import { nextTick } from "vue";
 import App from "../App.vue";
 
 const mockTelemetryDeck = {
-  clientUser: "",
+  clientUser: "guest",
   signal: vi.fn(),
   queue: vi.fn(),
   flush: vi.fn(),
@@ -30,13 +30,14 @@ describe("App", () => {
     mockTelemetryDeck.signal.mockReset();
     mockTelemetryDeck.queue.mockReset();
     mockTelemetryDeck.flush.mockReset();
-    mockTelemetryDeck.clientUser = "test-user";
+    mockTelemetryDeck.clientUser = "guest";
   });
 
   it("renders the demo controls", () => {
     const wrapper = mountApp();
 
     expect(wrapper.find("h1").text()).toBe("Demo controls");
+    expect(mockTelemetryDeck.clientUser).toBe("guest");
     expect(wrapper.find("#queuedTelemetryEvents").text()).toBe("0");
     expect(wrapper.find("#lastTelemetryAction").text()).toBe("");
     expect(wrapper.find("#lastTelemetryResult").text()).toBe("");
@@ -213,11 +214,44 @@ describe("App", () => {
       "flush failed: flush failed",
     );
 
+    await wrapper.find("#btnFlushClick").trigger("click");
+    await waitForClickHandler();
+
+    expect(wrapper.find("#lastTelemetryResult").text()).toBe(
+      "flush promise resolved without response",
+    );
+    expect(wrapper.find("#lastTelemetryError").text()).toBe("");
+
     await wrapper.find("#btnClearStatus").trigger("click");
     await nextTick();
 
     expect(wrapper.find("#lastTelemetryAction").text()).toBe("");
     expect(wrapper.find("#lastTelemetryResult").text()).toBe("");
     expect(wrapper.find("#lastTelemetryError").text()).toBe("");
+  });
+
+  it("updates safe action status while the promise is pending", async () => {
+    let resolveSignal: () => void = () => {};
+    mockTelemetryDeck.signal.mockReturnValueOnce(
+      new Promise<void>((resolve) => {
+        resolveSignal = resolve;
+      }),
+    );
+    const wrapper = mountApp();
+
+    await wrapper.find("#btnSafeSignalClick").trigger("click");
+    await nextTick();
+
+    expect(wrapper.find("#lastTelemetryAction").text()).toBe(
+      "Safe signal completed",
+    );
+    expect(wrapper.find("#lastTelemetryResult").text()).toBe("");
+
+    resolveSignal();
+    await waitForClickHandler();
+
+    expect(wrapper.find("#lastTelemetryResult").text()).toBe(
+      "safeSignal promise resolved",
+    );
   });
 });

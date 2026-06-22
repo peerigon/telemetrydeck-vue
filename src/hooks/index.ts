@@ -86,7 +86,7 @@ export function useTelemetryDeck() {
 
   const safeFlush = async () => {
     try {
-      await td?.flush();
+      await flush();
     } catch (error) {
       await handleError(error, { method: "flush" });
     }

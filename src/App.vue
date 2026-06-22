@@ -124,6 +124,8 @@ const runRawAction = async (
   onResolved?: () => void,
 ) => {
   lastAction.value = actionLabel;
+  lastResult.value = "";
+  lastError.value = "";
 
   try {
     const response = await action();
@@ -139,12 +141,18 @@ const runSafeAction = async (
   method: string,
   actionLabel: string,
   action: () => Promise<void>,
-  onResolved?: () => void,
 ) => {
-  await action();
-  onResolved?.();
   lastAction.value = actionLabel;
-  lastResult.value = `${method} promise resolved`;
+  lastResult.value = "";
+  lastError.value = "";
+
+  try {
+    await action();
+    lastResult.value = `${method} promise resolved`;
+  } catch (error) {
+    lastResult.value = `${method} rejected`;
+    lastError.value = `${method} failed: ${getErrorMessage(error)}`;
+  }
 };
 
 const getErrorMessage = (error: unknown) => {
