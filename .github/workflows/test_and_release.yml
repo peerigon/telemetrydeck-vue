@@ -31,11 +31,17 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Typecheck
+        run: npm run typecheck
+
       - name: Test
         run: npm test
 
       - name: Build
         run: npm run build
+
+      - name: Pack dry run
+        run: npm pack --dry-run --ignore-scripts
 
       - name: 🚀 Release
         env:

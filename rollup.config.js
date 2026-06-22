@@ -8,6 +8,7 @@ import commonjs from '@rollup/plugin-commonjs';
 export default [
   {
     input: 'index.ts',
+    external: ['@telemetrydeck/sdk'],
     output: [
       {
         format: 'esm',
@@ -17,7 +18,7 @@ export default [
       },
       {
         format: 'cjs',
-        file: 'dist/index.js',
+        file: 'dist/index.cjs',
         exports: 'named',
         plugins: [terser()]
       }
