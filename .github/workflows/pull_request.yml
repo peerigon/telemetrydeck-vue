@@ -13,13 +13,16 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: ".nvmrc"
 
       - name: Install deps and build (with cache)
         uses: bahmutov/npm-install@v1
 
       - name: Lint
         run: npm run lint
+
+      - name: Format check
+        run: npm run format:check
 
       - name: Typecheck
         run: npm run typecheck
@@ -30,9 +33,9 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Pack dry run
-        run: npm pack --dry-run --ignore-scripts
-      
+      - name: Pack contents
+        run: npm run test:pack
+
       - name: Size Limit
         uses: andresz1/size-limit-action@v1
         with:
