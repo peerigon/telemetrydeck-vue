@@ -40,10 +40,13 @@ const options = {
   appID: "other_app_id",
 };
 
-const changeClientUserClick = () => {
-  currentClientUser.value = `user${Math.floor(Math.random() * 1000)}`;
-  setClientUser(currentClientUser.value);
+const changeClientUserClick = async () => {
   lastAction.value = "Change user";
+  lastResult.value = "";
+  lastError.value = "";
+
+  currentClientUser.value = `user${Math.floor(Math.random() * 1000)}`;
+  await setClientUser(currentClientUser.value);
   lastResult.value = "setClientUser completed";
 };
 

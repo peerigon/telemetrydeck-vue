@@ -1,9 +1,10 @@
-import { mount } from "@vue/test-utils";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { mount, type VueWrapper } from "@vue/test-utils";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { nextTick } from "vue";
 import App from "../App.vue";
 
 let queuedSignals: unknown[] = [];
+const mountedWrappers: VueWrapper[] = [];
 
 const mockTelemetryDeck = {
   clientUser: "guest",
@@ -22,7 +23,7 @@ const waitForClickHandler = async () => {
 };
 
 const mountApp = (provide: Record<string, unknown> = {}) => {
-  return mount(App, {
+  const wrapper = mount(App, {
     global: {
       provide: {
         td: mockTelemetryDeck,
@@ -30,6 +31,8 @@ const mountApp = (provide: Record<string, unknown> = {}) => {
       },
     },
   });
+  mountedWrappers.push(wrapper);
+  return wrapper;
 };
 
 describe("App", () => {
@@ -46,6 +49,13 @@ describe("App", () => {
     mockTelemetryDeck.flush.mockImplementation(async () => {
       queuedSignals = [];
     });
+  });
+
+  afterEach(() => {
+    for (const wrapper of mountedWrappers) {
+      wrapper.unmount();
+    }
+    mountedWrappers.length = 0;
   });
 
   it("renders the demo controls", () => {
@@ -225,6 +235,23 @@ describe("App", () => {
     await waitForClickHandler();
 
     expect(wrapper.find("#lastTelemetryResult").text()).toBe("flush rejected");
+    expect(wrapper.find("#lastTelemetryError").text()).toBe(
+      "flush failed: flush failed",
+    );
+
+    await wrapper.find("#btnSetClient").trigger("click");
+    await waitForClickHandler();
+
+    expect(wrapper.find("#lastTelemetryAction").text()).toBe("Change user");
+    expect(wrapper.find("#lastTelemetryResult").text()).toBe(
+      "setClientUser completed",
+    );
+    expect(wrapper.find("#lastTelemetryError").text()).toBe("");
+
+    mockTelemetryDeck.flush.mockRejectedValueOnce(new Error("flush failed"));
+    await wrapper.find("#btnFlushClick").trigger("click");
+    await waitForClickHandler();
+
     expect(wrapper.find("#lastTelemetryError").text()).toBe(
       "flush failed: flush failed",
     );

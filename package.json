@@ -35,6 +35,7 @@
     "size": "size-limit",
     "test": "vitest --coverage",
     "test:exports": "node tests/exports/import.mjs && node tests/exports/require.cjs",
+    "test:pack": "node tests/pack/contents.mjs",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.build.json"
   },
   "dependencies": {
