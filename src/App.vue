@@ -2,7 +2,7 @@
 import { onMounted, onUnmounted, ref } from "vue";
 
 import { useTelemetryDeck } from "../index.ts";
-import type { TelemetryDeckErrorMeta } from "../index.ts";
+import type { TelemetryDeckErrorMeta, TelemetryDeckMethod } from "../index.ts";
 
 interface TelemetryDeckErrorEventDetail {
   message: string;
@@ -44,96 +44,115 @@ const clearStatusClick = () => {
 };
 
 const buttonSignalClick = async () => {
-  lastAction.value = "Signal sent immediately";
-  try {
-    const response = await signal("example_signal_event_name", payload("signal"));
-    lastResult.value = formatResolvedResult("signal", response);
-  } catch (error) {
-    lastResult.value = "signal rejected";
-    lastError.value = `signal failed: ${getErrorMessage(error)}`;
-  }
+  await runRawAction("signal", "Signal sent immediately", () =>
+    signal("example_signal_event_name", payload("signal")),
+  );
 };
 
 const buttonSignalClickWithOptions = async () => {
-  lastAction.value = "Signal sent with per-call options";
-  try {
-    const response = await signal(
+  await runRawAction("signal", "Signal sent with per-call options", () =>
+    signal(
       "example_signal_event_name_with_options",
       payload("signal_with_options"),
       options,
-    );
-    lastResult.value = formatResolvedResult("signal", response);
-  } catch (error) {
-    lastResult.value = "signal rejected";
-    lastError.value = `signal failed: ${getErrorMessage(error)}`;
-  }
+    ),
+  );
 };
 
 const buttonQueueClick = async () => {
-  lastAction.value = "Event added to the queue";
-  try {
-    const response = await queue("example_queue_event_name", payload("queue"));
-    queuedEvents.value += 1;
-    lastResult.value = formatResolvedResult("queue", response);
-  } catch (error) {
-    lastResult.value = "queue rejected";
-    lastError.value = `queue failed: ${getErrorMessage(error)}`;
-  }
+  await runRawAction(
+    "queue",
+    "Event added to the queue",
+    () => queue("example_queue_event_name", payload("queue")),
+    () => {
+      queuedEvents.value += 1;
+    },
+  );
 };
 
 const buttonQueueClickWithOptions = async () => {
-  lastAction.value = "Event with options added to the queue";
-  try {
-    const response = await queue(
+  await runRawAction(
+    "queue",
+    "Event with options added to the queue",
+    () => queue(
       "example_queue_event_name_with_options",
       payload("queue_with_options"),
       options,
-    );
-    queuedEvents.value += 1;
-    lastResult.value = formatResolvedResult("queue", response);
-  } catch (error) {
-    lastResult.value = "queue rejected";
-    lastError.value = `queue failed: ${getErrorMessage(error)}`;
-  }
+    ),
+    () => {
+      queuedEvents.value += 1;
+    },
+  );
 };
 
 const buttonFlushClick = async () => {
-  lastAction.value = "Queued events flushed";
-  try {
-    const response = await flush();
-    queuedEvents.value = 0;
-    lastResult.value = formatResolvedResult("flush", response);
-  } catch (error) {
-    lastResult.value = "flush rejected";
-    lastError.value = `flush failed: ${getErrorMessage(error)}`;
-  }
+  await runRawAction(
+    "flush",
+    "Queued events flushed",
+    flush,
+    () => {
+      queuedEvents.value = 0;
+    },
+  );
 };
 
 const buttonSafeSignalClick = async () => {
-  await safeSignal("example_safe_signal_event_name", payload("safe_signal"));
-  lastAction.value = "Safe signal completed";
-  lastResult.value = "safeSignal promise resolved";
+  await runSafeAction("safeSignal", "Safe signal completed", () =>
+    safeSignal("example_safe_signal_event_name", payload("safe_signal")),
+  );
 };
 
 const buttonSafeQueueClick = async () => {
-  await safeQueue("example_safe_queue_event_name", payload("safe_queue"));
-  queuedEvents.value += 1;
-  lastAction.value = "Safe queue completed";
-  lastResult.value = "safeQueue promise resolved";
+  await runSafeAction(
+    "safeQueue",
+    "Safe queue completed",
+    () => safeQueue("example_safe_queue_event_name", payload("safe_queue")),
+  );
 };
 
 const buttonSafeFlushClick = async () => {
-  await safeFlush();
-  queuedEvents.value = 0;
-  lastAction.value = "Safe flush completed";
-  lastResult.value = "safeFlush promise resolved";
+  await runSafeAction(
+    "safeFlush",
+    "Safe flush completed",
+    safeFlush,
+  );
+};
+
+const runRawAction = async (
+  method: TelemetryDeckMethod,
+  actionLabel: string,
+  action: () => Promise<unknown>,
+  onResolved?: () => void,
+) => {
+  lastAction.value = actionLabel;
+
+  try {
+    const response = await action();
+    onResolved?.();
+    lastResult.value = formatResolvedResult(method, response);
+  } catch (error) {
+    lastResult.value = `${method} rejected`;
+    lastError.value = `${method} failed: ${getErrorMessage(error)}`;
+  }
+};
+
+const runSafeAction = async (
+  method: string,
+  actionLabel: string,
+  action: () => Promise<void>,
+  onResolved?: () => void,
+) => {
+  await action();
+  onResolved?.();
+  lastAction.value = actionLabel;
+  lastResult.value = `${method} promise resolved`;
 };
 
 const getErrorMessage = (error: unknown) => {
   return error instanceof Error ? error.message : String(error);
 };
 
-const formatResolvedResult = (method: string, response: unknown) => {
+const formatResolvedResult = (method: TelemetryDeckMethod, response: unknown) => {
   if (response === undefined) {
     return `${method} promise resolved without response`;
   }
@@ -142,7 +161,11 @@ const formatResolvedResult = (method: string, response: unknown) => {
     return `${method} response: ${response}`;
   }
 
-  return `${method} response: ${JSON.stringify(response)}`;
+  try {
+    return `${method} response: ${JSON.stringify(response)}`;
+  } catch {
+    return `${method} response could not be serialized`;
+  }
 };
 
 const formatErrorMeta = (meta: TelemetryDeckErrorMeta) => {
@@ -177,7 +200,7 @@ onUnmounted(() => {
         </div>
         <div>
           <dt>Queued</dt>
-          <dd>{{ queuedEvents }}</dd>
+          <dd id="queuedTelemetryEvents">{{ queuedEvents }}</dd>
         </div>
         <div class="status-wide">
           <dt>Last action</dt>

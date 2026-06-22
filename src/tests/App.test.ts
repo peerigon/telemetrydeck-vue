@@ -16,6 +16,16 @@ const waitForClickHandler = async () => {
   await nextTick();
 };
 
+const mountApp = () => {
+  return mount(App, {
+    global: {
+      provide: {
+        td: mockTelemetryDeck,
+      },
+    },
+  });
+};
+
 describe('App', () => {
   beforeEach(() => {
     mockTelemetryDeck.signal.mockReset();
@@ -25,15 +35,10 @@ describe('App', () => {
   });
 
   it('renders the demo controls', () => {
-    const wrapper = mount(App, {
-      global: {
-        provide: {
-          td: mockTelemetryDeck,
-        },
-      },
-    });
+    const wrapper = mountApp();
 
     expect(wrapper.find('h1').text()).toBe('Demo controls');
+    expect(wrapper.find('#queuedTelemetryEvents').text()).toBe('0');
     expect(wrapper.find('#lastTelemetryAction').text()).toBe('');
     expect(wrapper.find('#lastTelemetryResult').text()).toBe('');
     expect(wrapper.find('#lastTelemetryError').text()).toBe('');
@@ -59,13 +64,7 @@ describe('App', () => {
   });
 
   it('calls TelemetryDeck methods from the demo controls', async () => {
-    const wrapper = mount(App, {
-      global: {
-        provide: {
-          td: mockTelemetryDeck,
-        },
-      },
-    });
+    const wrapper = mountApp();
 
     mockTelemetryDeck.signal.mockResolvedValueOnce({ accepted: true });
 
@@ -94,6 +93,7 @@ describe('App', () => {
       undefined,
     );
     expect(wrapper.find('#lastTelemetryResult').text()).toBe('queue promise resolved without response');
+    expect(wrapper.find('#queuedTelemetryEvents').text()).toBe('1');
 
     await wrapper.find('#btnQueueClickWithOptions').trigger('click');
     await waitForClickHandler();
@@ -123,6 +123,7 @@ describe('App', () => {
     await waitForClickHandler();
     expect(mockTelemetryDeck.flush).toHaveBeenCalledTimes(1);
     expect(wrapper.find('#lastTelemetryResult').text()).toBe('flush promise resolved without response');
+    expect(wrapper.find('#queuedTelemetryEvents').text()).toBe('0');
 
     await wrapper.find('#btnSafeSignalClick').trigger('click');
     await waitForClickHandler();
@@ -144,11 +145,14 @@ describe('App', () => {
       }),
       undefined,
     );
+    expect(wrapper.find('#lastTelemetryResult').text()).toBe('safeQueue promise resolved');
+    expect(wrapper.find('#queuedTelemetryEvents').text()).toBe('0');
 
     await wrapper.find('#btnSafeFlushClick').trigger('click');
     await waitForClickHandler();
     expect(mockTelemetryDeck.flush).toHaveBeenCalledTimes(2);
     expect(wrapper.find('#lastTelemetryResult').text()).toBe('safeFlush promise resolved');
+    expect(wrapper.find('#queuedTelemetryEvents').text()).toBe('0');
 
     let previousClientUser = mockTelemetryDeck.clientUser;
     await wrapper.find('#btnSetClient').trigger('click');
@@ -165,13 +169,7 @@ describe('App', () => {
   });
 
   it('displays TelemetryDeck errors captured by the demo onError handler', async () => {
-    const wrapper = mount(App, {
-      global: {
-        provide: {
-          td: mockTelemetryDeck,
-        },
-      },
-    });
+    const wrapper = mountApp();
 
     window.dispatchEvent(new CustomEvent('telemetrydeck:error', {
       detail: {
@@ -188,13 +186,7 @@ describe('App', () => {
 
   it('displays raw method promise rejections', async () => {
     mockTelemetryDeck.flush.mockRejectedValueOnce(new Error('flush failed'));
-    const wrapper = mount(App, {
-      global: {
-        provide: {
-          td: mockTelemetryDeck,
-        },
-      },
-    });
+    const wrapper = mountApp();
 
     await wrapper.find('#btnFlushClick').trigger('click');
     await waitForClickHandler();
