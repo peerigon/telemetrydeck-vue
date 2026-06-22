@@ -58,8 +58,8 @@ const buttonQueueClick = () => {
   });
 };
 
-const buttonSignalClickWithOptions = () => {
-  signal(
+const buttonSignalClickWithOptions = async () => {
+  await signal(
     "example_signal_event_name_with_options",
     {
       custom_data: "other_data", // any custom data as required
@@ -72,8 +72,8 @@ const buttonSignalClickWithOptions = () => {
   ); // telemetryDeck options (optional)
 };
 
-const buttonQueueClickWithOptions = () => {
-  queue(
+const buttonQueueClickWithOptions = async () => {
+  await queue(
     "example_queue_event_name_with_options",
     {
       custom_data: "other_data", // any custom data as required

@@ -12,6 +12,7 @@ const mockTelemetryDeck = {
 
 const waitForClickHandler = async () => {
   await Promise.resolve();
+  await Promise.resolve();
   await nextTick();
 };
 

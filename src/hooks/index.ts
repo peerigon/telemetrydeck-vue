@@ -66,7 +66,7 @@ export function useTelemetryDeck() {
     options?: TelemetryDeckOptions,
   ) => {
     try {
-      await td?.signal(type, payload, options);
+      await signal(type, payload, options);
     } catch (error) {
       await handleError(error, { method: "signal", type, payload, options });
     }
@@ -78,7 +78,7 @@ export function useTelemetryDeck() {
     options?: TelemetryDeckOptions,
   ) => {
     try {
-      await td?.queue(type, payload, options);
+      await queue(type, payload, options);
     } catch (error) {
       await handleError(error, { method: "queue", type, payload, options });
     }
