@@ -15,6 +15,7 @@ const {
   signal,
   queue,
   flush,
+  getQueueCount,
   safeSignal,
   safeQueue,
   safeFlush,
@@ -22,7 +23,7 @@ const {
 } = useTelemetryDeck();
 
 const currentClientUser = ref("guest");
-const queuedEvents = ref(0);
+const queuedEvents = ref(getQueueCount());
 const lastAction = ref("");
 const lastResult = ref("");
 const lastError = ref("");
@@ -42,7 +43,7 @@ const options = {
 const changeClientUserClick = () => {
   currentClientUser.value = `user${Math.floor(Math.random() * 1000)}`;
   setClientUser(currentClientUser.value);
-  lastAction.value = `Client user changed to ${currentClientUser.value}`;
+  lastAction.value = "Change user";
   lastResult.value = "setClientUser completed";
 };
 
@@ -52,14 +53,18 @@ const clearStatusClick = () => {
   lastError.value = "";
 };
 
+const refreshQueuedEvents = () => {
+  queuedEvents.value = getQueueCount();
+};
+
 const buttonSignalClick = async () => {
-  await runRawAction("signal", "Signal sent immediately", () =>
+  await runRawAction("signal", "Send signal", () =>
     signal("example_signal_event_name", payload("signal")),
   );
 };
 
 const buttonSignalClickWithOptions = async () => {
-  await runRawAction("signal", "Signal sent with per-call options", () =>
+  await runRawAction("signal", "Send signal with options", () =>
     signal(
       "example_signal_event_name_with_options",
       payload("signal_with_options"),
@@ -69,59 +74,50 @@ const buttonSignalClickWithOptions = async () => {
 };
 
 const buttonQueueClick = async () => {
-  await runRawAction(
-    "queue",
-    "Event added to the queue",
-    () => queue("example_queue_event_name", payload("queue")),
-    () => {
-      queuedEvents.value += 1;
-    },
+  await runRawAction("queue", "Queue event", () =>
+    queue("example_queue_event_name", payload("queue")),
   );
+  refreshQueuedEvents();
 };
 
 const buttonQueueClickWithOptions = async () => {
-  await runRawAction(
-    "queue",
-    "Event with options added to the queue",
-    () =>
-      queue(
-        "example_queue_event_name_with_options",
-        payload("queue_with_options"),
-        options,
-      ),
-    () => {
-      queuedEvents.value += 1;
-    },
+  await runRawAction("queue", "Queue event with options", () =>
+    queue(
+      "example_queue_event_name_with_options",
+      payload("queue_with_options"),
+      options,
+    ),
   );
+  refreshQueuedEvents();
 };
 
 const buttonFlushClick = async () => {
-  await runRawAction("flush", "Queued events flushed", flush, () => {
-    queuedEvents.value = 0;
-  });
+  await runRawAction("flush", "Flush queue", flush);
+  refreshQueuedEvents();
 };
 
 const buttonSafeSignalClick = async () => {
-  await runSafeAction("safeSignal", "Safe signal completed", () =>
+  await runSafeAction("safeSignal", "Safe signal", () =>
     safeSignal("example_safe_signal_event_name", payload("safe_signal")),
   );
 };
 
 const buttonSafeQueueClick = async () => {
-  await runSafeAction("safeQueue", "Safe queue completed", () =>
+  await runSafeAction("safeQueue", "Safe queue", () =>
     safeQueue("example_safe_queue_event_name", payload("safe_queue")),
   );
+  refreshQueuedEvents();
 };
 
 const buttonSafeFlushClick = async () => {
-  await runSafeAction("safeFlush", "Safe flush completed", safeFlush);
+  await runSafeAction("safeFlush", "Safe flush", safeFlush);
+  refreshQueuedEvents();
 };
 
 const runRawAction = async (
   method: TelemetryDeckMethod,
   actionLabel: string,
   action: () => Promise<unknown>,
-  onResolved?: () => void,
 ) => {
   lastAction.value = actionLabel;
   lastResult.value = "";
@@ -129,7 +125,6 @@ const runRawAction = async (
 
   try {
     const response = await action();
-    onResolved?.();
     lastResult.value = formatResolvedResult(method, response);
   } catch (error) {
     lastResult.value = `${method} rejected`;

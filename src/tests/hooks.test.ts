@@ -8,6 +8,9 @@ const mockTelemetryDeck = {
   signal: vi.fn(),
   queue: vi.fn(),
   flush: vi.fn(),
+  store: {
+    values: vi.fn(() => []),
+  },
 };
 
 const HookConsumer = defineComponent({
@@ -23,6 +26,8 @@ describe("useTelemetryDeck safe methods", () => {
     mockTelemetryDeck.signal.mockReset();
     mockTelemetryDeck.queue.mockReset();
     mockTelemetryDeck.flush.mockReset();
+    mockTelemetryDeck.store.values.mockReset();
+    mockTelemetryDeck.store.values.mockReturnValue([]);
   });
 
   it("swallows rejected promises in safe methods and calls onError", async () => {
@@ -180,5 +185,20 @@ describe("useTelemetryDeck safe methods", () => {
     await expect(vm.signal("ui.opened")).rejects.toBe(signalError);
     await expect(vm.queue("button.clicked")).rejects.toBe(queueError);
     await expect(vm.flush()).rejects.toBe(flushError);
+  });
+
+  it("returns the current sdk queue count", () => {
+    mockTelemetryDeck.store.values.mockReturnValue([{}, {}]);
+
+    const wrapper = mount(HookConsumer, {
+      global: {
+        provide: {
+          td: mockTelemetryDeck,
+        },
+      },
+    });
+    const vm = wrapper.vm as unknown as ReturnType<typeof useTelemetryDeck>;
+
+    expect(vm.getQueueCount()).toBe(2);
   });
 });

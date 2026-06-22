@@ -123,11 +123,15 @@ const buttonQueueClickWithOptions = async () => {
 ```ts
 import { useTelemetryDeck } from "@peerigon/telemetrydeck-vue";
 
-const { flush, safeFlush } = useTelemetryDeck();
+const { queue, flush, safeFlush, getQueueCount } = useTelemetryDeck();
 
+await queue("example_queue_event_name");
+console.log(getQueueCount());
 await flush();
 await safeFlush();
 ```
+
+`getQueueCount()` returns the number of signals currently stored in the SDK queue. It does not indicate whether queued signals have been sent successfully.
 
 `signal()`, `queue()`, and `flush()` return promises and may reject (for example on network failures).  
 Use `safeSignal()`, `safeQueue()`, and `safeFlush()` for fire-and-forget analytics calls to avoid unhandled promise rejections.

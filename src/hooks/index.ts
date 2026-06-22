@@ -60,6 +60,10 @@ export function useTelemetryDeck() {
     return td?.flush();
   };
 
+  const getQueueCount = () => {
+    return td?.store?.values().length ?? 0;
+  };
+
   const safeSignal = async (
     type: string,
     payload?: TelemetryDeckPayload,
@@ -97,6 +101,7 @@ export function useTelemetryDeck() {
     signal,
     queue,
     flush,
+    getQueueCount,
     safeSignal,
     safeQueue,
     safeFlush,

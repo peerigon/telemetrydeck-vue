@@ -3,11 +3,16 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { nextTick } from "vue";
 import App from "../App.vue";
 
+let queuedSignals: unknown[] = [];
+
 const mockTelemetryDeck = {
   clientUser: "guest",
   signal: vi.fn(),
   queue: vi.fn(),
   flush: vi.fn(),
+  store: {
+    values: vi.fn(() => queuedSignals),
+  },
 };
 
 const waitForClickHandler = async () => {
@@ -16,11 +21,12 @@ const waitForClickHandler = async () => {
   await nextTick();
 };
 
-const mountApp = () => {
+const mountApp = (provide: Record<string, unknown> = {}) => {
   return mount(App, {
     global: {
       provide: {
         td: mockTelemetryDeck,
+        ...provide,
       },
     },
   });
@@ -31,7 +37,15 @@ describe("App", () => {
     mockTelemetryDeck.signal.mockReset();
     mockTelemetryDeck.queue.mockReset();
     mockTelemetryDeck.flush.mockReset();
+    mockTelemetryDeck.store.values.mockClear();
     mockTelemetryDeck.clientUser = "guest";
+    queuedSignals = [];
+    mockTelemetryDeck.queue.mockImplementation(async () => {
+      queuedSignals.push({});
+    });
+    mockTelemetryDeck.flush.mockImplementation(async () => {
+      queuedSignals = [];
+    });
   });
 
   it("renders the demo controls", () => {
@@ -157,7 +171,7 @@ describe("App", () => {
     expect(wrapper.find("#lastTelemetryResult").text()).toBe(
       "safeQueue promise resolved",
     );
-    expect(wrapper.find("#queuedTelemetryEvents").text()).toBe("0");
+    expect(wrapper.find("#queuedTelemetryEvents").text()).toBe("1");
 
     await wrapper.find("#btnSafeFlushClick").trigger("click");
     await waitForClickHandler();
@@ -231,6 +245,33 @@ describe("App", () => {
     expect(wrapper.find("#lastTelemetryError").text()).toBe("");
   });
 
+  it("does not increment the queue count when safe queue captures an error", async () => {
+    mockTelemetryDeck.queue.mockRejectedValueOnce(new Error("queue failed"));
+    const wrapper = mountApp({
+      tdOnError: (error: unknown, meta: unknown) => {
+        window.dispatchEvent(
+          new CustomEvent("telemetrydeck:error", {
+            detail: {
+              message: error instanceof Error ? error.message : String(error),
+              meta,
+            },
+          }),
+        );
+      },
+    });
+
+    await wrapper.find("#btnSafeQueueClick").trigger("click");
+    await waitForClickHandler();
+
+    expect(wrapper.find("#lastTelemetryResult").text()).toBe(
+      "safeQueue promise resolved",
+    );
+    expect(wrapper.find("#lastTelemetryError").text()).toBe(
+      "queue: example_safe_queue_event_name failed: queue failed",
+    );
+    expect(wrapper.find("#queuedTelemetryEvents").text()).toBe("0");
+  });
+
   it("updates safe action status while the promise is pending", async () => {
     let resolveSignal: () => void = () => {};
     mockTelemetryDeck.signal.mockReturnValueOnce(
@@ -243,9 +284,7 @@ describe("App", () => {
     await wrapper.find("#btnSafeSignalClick").trigger("click");
     await nextTick();
 
-    expect(wrapper.find("#lastTelemetryAction").text()).toBe(
-      "Safe signal completed",
-    );
+    expect(wrapper.find("#lastTelemetryAction").text()).toBe("Safe signal");
     expect(wrapper.find("#lastTelemetryResult").text()).toBe("");
 
     resolveSignal();
