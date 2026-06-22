@@ -1,6 +1,6 @@
 # telemetrydeck-vue
 
-A library for using TelemetryDeck in your React app.
+A library for using TelemetryDeck in your Vue app.
 
 [![semantic-release: angular](https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
 
@@ -17,6 +17,7 @@ npm i @peerigon/telemetrydeck-vue --save
 Set up the plugin in your application setup:
 
 ```javascript
+import { createApp } from 'vue';
 import TelemetryDeckPlugin from '@peerigon/telemetrydeck-vue';
 
 const app = createApp(App);
@@ -100,11 +101,11 @@ Use `safeSignal()` and `safeQueue()` for fire-and-forget analytics calls to avoi
 
 To run the plugin locally for development:
 
-1. Install Node.js v20
+1. Install the Node.js version from `.nvmrc`
 2. Run `npm i`
-3. create .env file from .env.example and add your test telemetryDeck appID. Create an account here: [telemetrydeck.com](https://telemetrydeck.com/)
-3. Run `npm run dev`
-4. Navigate to [http://localhost:5173/](http://localhost:5173/) for the test page
+3. Create a `.env` file from `.env.example` and add your test TelemetryDeck appID. Create an account here: [telemetrydeck.com](https://telemetrydeck.com/)
+4. Run `npm run dev`
+5. Navigate to [http://localhost:5173/](http://localhost:5173/) for the test page
 
 ### Tests
 
