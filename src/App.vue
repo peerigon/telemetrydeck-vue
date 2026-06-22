@@ -1,75 +1,453 @@
 <script setup lang="ts">
-  import { useTelemetryDeck } from "../index.ts";
-  const { signal, queue, setClientUser } = useTelemetryDeck();
+import { onMounted, onUnmounted, ref } from "vue";
 
-  const changeClientUserClick = () => {
-    setClientUser('user' + Math.floor(Math.random() * 1000));
-  };
+import { useTelemetryDeck } from "../index.ts";
+import type { TelemetryDeckErrorMeta } from "../index.ts";
 
-  const buttonSignalClick = () => {
-    signal('example_signal_event_name', {
-      custom_data: 'other_data',
-      timestamp: new Date().toISOString(),
-    });
-  };
-  const buttonQueueClick = () => {
-    queue('example_queue_event_name', {
-      custom_data: 'other_data',
-      timestamp: new Date().toISOString(),
-    });
-  };
-  const buttonSignalClickWithOptions = () => {
-    signal('example_signal_event_name_with_options', {
-      custom_data: 'other_data',
-      timestamp: new Date().toISOString(),
-    }, {
-      testMode: true,
-      clientUser: 'other_user',
-      appID: 'other_app_id',
-    }
-  );
-  };
-  const buttonQueueClickWithOptions = () => {
-    queue('example_queue_event_name_with_options', {
-      custom_data: 'other_data',
-      timestamp: new Date().toISOString(),
-    },
-    {
-      testMode: true,
-      clientUser: 'other_user',
-      appID: 'other_app_id',
-    });
-  };
+interface TelemetryDeckErrorEventDetail {
+  message: string;
+  meta: TelemetryDeckErrorMeta;
+}
+
+const { signal, queue, flush, safeSignal, safeQueue, safeFlush, setClientUser } =
+  useTelemetryDeck();
+
+const currentClientUser = ref("guest");
+const queuedEvents = ref(0);
+const lastAction = ref("");
+const lastResult = ref("");
+const lastError = ref("");
+
+const payload = (source: string) => ({
+  source,
+  custom_data: "other_data",
+  timestamp: new Date().toISOString(),
+});
+
+const options = {
+  testMode: true,
+  clientUser: "other_user",
+  appID: "other_app_id",
+};
+
+const changeClientUserClick = () => {
+  currentClientUser.value = `user${Math.floor(Math.random() * 1000)}`;
+  setClientUser(currentClientUser.value);
+  lastAction.value = `Client user changed to ${currentClientUser.value}`;
+  lastResult.value = "setClientUser completed";
+};
+
+const clearStatusClick = () => {
+  lastAction.value = "";
+  lastResult.value = "";
+  lastError.value = "";
+};
+
+const buttonSignalClick = async () => {
+  lastAction.value = "Signal sent immediately";
+  try {
+    const response = await signal("example_signal_event_name", payload("signal"));
+    lastResult.value = formatResolvedResult("signal", response);
+  } catch (error) {
+    lastResult.value = "signal rejected";
+    lastError.value = `signal failed: ${getErrorMessage(error)}`;
+  }
+};
+
+const buttonSignalClickWithOptions = async () => {
+  lastAction.value = "Signal sent with per-call options";
+  try {
+    const response = await signal(
+      "example_signal_event_name_with_options",
+      payload("signal_with_options"),
+      options,
+    );
+    lastResult.value = formatResolvedResult("signal", response);
+  } catch (error) {
+    lastResult.value = "signal rejected";
+    lastError.value = `signal failed: ${getErrorMessage(error)}`;
+  }
+};
+
+const buttonQueueClick = async () => {
+  lastAction.value = "Event added to the queue";
+  try {
+    const response = await queue("example_queue_event_name", payload("queue"));
+    queuedEvents.value += 1;
+    lastResult.value = formatResolvedResult("queue", response);
+  } catch (error) {
+    lastResult.value = "queue rejected";
+    lastError.value = `queue failed: ${getErrorMessage(error)}`;
+  }
+};
+
+const buttonQueueClickWithOptions = async () => {
+  lastAction.value = "Event with options added to the queue";
+  try {
+    const response = await queue(
+      "example_queue_event_name_with_options",
+      payload("queue_with_options"),
+      options,
+    );
+    queuedEvents.value += 1;
+    lastResult.value = formatResolvedResult("queue", response);
+  } catch (error) {
+    lastResult.value = "queue rejected";
+    lastError.value = `queue failed: ${getErrorMessage(error)}`;
+  }
+};
+
+const buttonFlushClick = async () => {
+  lastAction.value = "Queued events flushed";
+  try {
+    const response = await flush();
+    queuedEvents.value = 0;
+    lastResult.value = formatResolvedResult("flush", response);
+  } catch (error) {
+    lastResult.value = "flush rejected";
+    lastError.value = `flush failed: ${getErrorMessage(error)}`;
+  }
+};
+
+const buttonSafeSignalClick = async () => {
+  await safeSignal("example_safe_signal_event_name", payload("safe_signal"));
+  lastAction.value = "Safe signal completed";
+  lastResult.value = "safeSignal promise resolved";
+};
+
+const buttonSafeQueueClick = async () => {
+  await safeQueue("example_safe_queue_event_name", payload("safe_queue"));
+  queuedEvents.value += 1;
+  lastAction.value = "Safe queue completed";
+  lastResult.value = "safeQueue promise resolved";
+};
+
+const buttonSafeFlushClick = async () => {
+  await safeFlush();
+  queuedEvents.value = 0;
+  lastAction.value = "Safe flush completed";
+  lastResult.value = "safeFlush promise resolved";
+};
+
+const getErrorMessage = (error: unknown) => {
+  return error instanceof Error ? error.message : String(error);
+};
+
+const formatResolvedResult = (method: string, response: unknown) => {
+  if (response === undefined) {
+    return `${method} promise resolved without response`;
+  }
+
+  if (typeof response === "string") {
+    return `${method} response: ${response}`;
+  }
+
+  return `${method} response: ${JSON.stringify(response)}`;
+};
+
+const formatErrorMeta = (meta: TelemetryDeckErrorMeta) => {
+  return meta.type ? `${meta.method}: ${meta.type}` : meta.method;
+};
+
+const handleTelemetryDeckError = (event: Event) => {
+  const { message, meta } = (event as CustomEvent<TelemetryDeckErrorEventDetail>).detail;
+  lastError.value = `${formatErrorMeta(meta)} failed: ${message}`;
+};
+
+onMounted(() => {
+  window.addEventListener("telemetrydeck:error", handleTelemetryDeckError);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("telemetrydeck:error", handleTelemetryDeckError);
+});
 </script>
+
 <template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <div>
-    <button id="btnSignalClick" @click="buttonSignalClick">Log a click with signal</button>
-    <button id="btnQueueClick" @click="buttonQueueClick">Log a click with queue</button>
-    <button id="btnSetClient" @click="changeClientUserClick">Change user</button>
-    </div>
-    <div>
-      <button id="btnSignalClickWithOptions" @click="buttonSignalClickWithOptions">Log a click with signal with Options</button>
-      <button id="btnQueueClickWithOptions" @click="buttonQueueClickWithOptions">Log a click with queue with Options</button>
-    </div>
-  </div>
-  
+  <main class="demo-shell">
+    <header class="demo-header">
+      <div>
+        <p class="eyebrow">TelemetryDeck Vue</p>
+        <h1>Demo controls</h1>
+      </div>
+      <dl class="status-list" aria-label="TelemetryDeck demo state">
+        <div>
+          <dt>User</dt>
+          <dd>{{ currentClientUser }}</dd>
+        </div>
+        <div>
+          <dt>Queued</dt>
+          <dd>{{ queuedEvents }}</dd>
+        </div>
+        <div class="status-wide">
+          <dt>Last action</dt>
+          <dd id="lastTelemetryAction">{{ lastAction }}</dd>
+        </div>
+        <div class="status-wide">
+          <dt>Last result</dt>
+          <dd id="lastTelemetryResult">{{ lastResult }}</dd>
+        </div>
+        <div class="status-wide status-error">
+          <dt>Last error</dt>
+          <dd id="lastTelemetryError">{{ lastError }}</dd>
+        </div>
+      </dl>
+      <button id="btnClearStatus" class="clear-action" type="button" @click="clearStatusClick">
+        Clear last action
+      </button>
+    </header>
+
+    <section class="demo-section" aria-labelledby="send-now-title">
+      <div>
+        <p class="section-kicker">Send now</p>
+        <h2 id="send-now-title">Signal</h2>
+      </div>
+      <div class="button-grid">
+        <button id="btnSignalClick" class="primary-action" type="button" @click="buttonSignalClick">
+          Send signal
+        </button>
+        <button
+          id="btnSignalClickWithOptions"
+          class="secondary-action"
+          type="button"
+          @click="buttonSignalClickWithOptions"
+        >
+          Send signal with options
+        </button>
+      </div>
+    </section>
+
+    <section class="demo-section" aria-labelledby="queue-title">
+      <div>
+        <p class="section-kicker">Queue for later</p>
+        <h2 id="queue-title">Queue and flush</h2>
+      </div>
+      <div class="button-grid">
+        <button id="btnQueueClick" class="queue-action" type="button" @click="buttonQueueClick">
+          Queue event
+        </button>
+        <button
+          id="btnQueueClickWithOptions"
+          class="queue-action"
+          type="button"
+          @click="buttonQueueClickWithOptions"
+        >
+          Queue event with options
+        </button>
+        <button id="btnFlushClick" class="flush-action" type="button" @click="buttonFlushClick">
+          Flush queue
+        </button>
+      </div>
+    </section>
+
+    <section class="demo-section" aria-labelledby="safe-title">
+      <div>
+        <p class="section-kicker">Fire and forget</p>
+        <h2 id="safe-title">Safe wrappers</h2>
+      </div>
+      <div class="button-grid">
+        <button id="btnSafeSignalClick" class="safe-action" type="button" @click="buttonSafeSignalClick">
+          Safe signal
+        </button>
+        <button id="btnSafeQueueClick" class="safe-action" type="button" @click="buttonSafeQueueClick">
+          Safe queue
+        </button>
+        <button id="btnSafeFlushClick" class="safe-action" type="button" @click="buttonSafeFlushClick">
+          Safe flush
+        </button>
+      </div>
+    </section>
+
+    <section class="demo-section user-section" aria-labelledby="user-title">
+      <div>
+        <p class="section-kicker">User state</p>
+        <h2 id="user-title">Client user</h2>
+      </div>
+      <button id="btnSetClient" class="user-action" type="button" @click="changeClientUserClick">
+        Change user
+      </button>
+    </section>
+  </main>
 </template>
 
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+.demo-shell {
+  width: min(100%, 1040px);
+  margin: 0 auto;
+  padding: 48px 24px;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+
+.demo-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 460px);
+  gap: 32px;
+  align-items: end;
+  padding-bottom: 32px;
+  border-bottom: 1px solid #d8dee8;
 }
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+
+.eyebrow,
+.section-kicker {
+  margin: 0 0 8px;
+  color: #4a6a58;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h1,
+h2 {
+  margin: 0;
+  color: #162033;
+}
+
+h1 {
+  font-size: 2.75rem;
+  line-height: 1;
+}
+
+h2 {
+  font-size: 1.35rem;
+}
+
+.status-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.status-list div {
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.status-wide {
+  grid-column: 1 / -1;
+}
+
+.status-error dd {
+  color: #8a1f14;
+}
+
+.clear-action {
+  grid-column: 2;
+  justify-self: end;
+  width: auto;
+  min-height: 40px;
+  padding: 8px 14px;
+  background: #ffffff;
+  color: #3e4f68;
+  border-color: #c4ccd8;
+  font-weight: 800;
+}
+
+dt {
+  color: #637087;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+dd {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+  color: #162033;
+  font-weight: 700;
+}
+
+.demo-section {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  padding: 28px 0;
+  border-bottom: 1px solid #d8dee8;
+}
+
+.button-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+button {
+  min-height: 56px;
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgb(22 32 51 / 14%);
+}
+
+button:focus-visible {
+  outline: 3px solid #f2c94c;
+  outline-offset: 3px;
+}
+
+.primary-action {
+  background: #2157d6;
+}
+
+.secondary-action {
+  background: #2b6b78;
+}
+
+.queue-action {
+  background: #74652f;
+}
+
+.flush-action {
+  background: #c23a2b;
+}
+
+.safe-action {
+  background: #2e7448;
+}
+
+.user-action {
+  max-width: 220px;
+  background: #3e4f68;
+}
+
+@media (max-width: 760px) {
+  .demo-shell {
+    padding: 32px 16px;
+  }
+
+  .demo-header,
+  .demo-section {
+    grid-template-columns: 1fr;
+  }
+
+  .clear-action {
+    grid-column: auto;
+    justify-self: stretch;
+    width: 100%;
+  }
+
+  h1 {
+    font-size: 2.2rem;
+  }
+
+  .user-action {
+    max-width: none;
+  }
 }
 </style>

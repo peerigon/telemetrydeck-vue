@@ -9,6 +9,7 @@ const { mockTelemetryDeck, telemetryDeckCtor } = vi.hoisted(() => {
     clientUser: 'test-user',
     signal: vi.fn(),
     queue: vi.fn(),
+    flush: vi.fn(),
   };
 
   return {
@@ -36,15 +37,18 @@ describe('plugin onError integration', () => {
     telemetryDeckCtor.mockClear();
     mockTelemetryDeck.signal.mockReset();
     mockTelemetryDeck.queue.mockReset();
+    mockTelemetryDeck.flush.mockReset();
   });
 
   it('routes safe method errors to plugin onError handler', async () => {
     const signalError = new Error('signal failed');
     const queueError = new Error('queue failed');
+    const flushError = new Error('flush failed');
     const onError = vi.fn();
 
     mockTelemetryDeck.signal.mockRejectedValueOnce(signalError);
     mockTelemetryDeck.queue.mockRejectedValueOnce(queueError);
+    mockTelemetryDeck.flush.mockRejectedValueOnce(flushError);
 
     const wrapper = mount(HookConsumer, {
       global: {
@@ -55,13 +59,14 @@ describe('plugin onError integration', () => {
 
     await expect(vm.safeSignal('ui.opened')).resolves.toBeUndefined();
     await expect(vm.safeQueue('button.clicked')).resolves.toBeUndefined();
+    await expect(vm.safeFlush()).resolves.toBeUndefined();
 
     expect(telemetryDeckCtor).toHaveBeenCalledWith({
       appID: 'test-app-id',
       clientUser: 'guest',
       testMode: false,
     });
-    expect(onError).toHaveBeenCalledTimes(2);
+    expect(onError).toHaveBeenCalledTimes(3);
     expect(onError).toHaveBeenNthCalledWith(1, signalError, {
       method: 'signal',
       type: 'ui.opened',
@@ -73,6 +78,9 @@ describe('plugin onError integration', () => {
       type: 'button.clicked',
       payload: undefined,
       options: undefined,
+    });
+    expect(onError).toHaveBeenNthCalledWith(3, flushError, {
+      method: 'flush',
     });
   });
 });

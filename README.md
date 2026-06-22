@@ -92,8 +92,19 @@ const buttonQueueClickWithOptions = () => {
 </template>
 ```
 
-`signal()` and `queue()` return promises and may reject (for example on network failures).  
-Use `safeSignal()` and `safeQueue()` for fire-and-forget analytics calls to avoid unhandled promise rejections.
+## Flushing Queued Events
+
+```ts
+import { useTelemetryDeck } from "@peerigon/telemetrydeck-vue";
+
+const { flush, safeFlush } = useTelemetryDeck();
+
+await flush();
+await safeFlush();
+```
+
+`signal()`, `queue()`, and `flush()` return promises and may reject (for example on network failures).  
+Use `safeSignal()`, `safeQueue()`, and `safeFlush()` for fire-and-forget analytics calls to avoid unhandled promise rejections.
 
 ## Contributions
 

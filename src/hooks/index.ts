@@ -2,7 +2,7 @@ import { inject } from 'vue';
 import type TelemetryDeck from '@telemetrydeck/sdk';
 import type { TelemetryDeckOptions, TelemetryDeckPayload } from '@telemetrydeck/sdk';
 
-export type TelemetryDeckMethod = 'signal' | 'queue';
+export type TelemetryDeckMethod = 'signal' | 'queue' | 'flush';
 
 export interface TelemetryDeckErrorMeta {
   method: TelemetryDeckMethod;
@@ -42,6 +42,10 @@ export function useTelemetryDeck() {
     return td?.queue(type, payload, options);
   };
 
+  const flush = async () => {
+    return td?.flush();
+  };
+
   const safeSignal = async (type: string, payload?: TelemetryDeckPayload, options?: TelemetryDeckOptions) => {
     try {
       await td?.signal(type, payload, options);
@@ -58,11 +62,21 @@ export function useTelemetryDeck() {
     }
   };
 
+  const safeFlush = async () => {
+    try {
+      await td?.flush();
+    } catch (error) {
+      await handleError(error, { method: 'flush' });
+    }
+  };
+
   return {
     setClientUser,
     signal,
     queue,
+    flush,
     safeSignal,
     safeQueue,
+    safeFlush,
   };
 }
