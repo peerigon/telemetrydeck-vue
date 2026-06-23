@@ -136,6 +136,23 @@ await safeFlush();
 `signal()`, `queue()`, and `flush()` return promises and may reject (for example on network failures).  
 Use `safeSignal()`, `safeQueue()`, and `safeFlush()` for fire-and-forget analytics calls to avoid unhandled promise rejections.
 
+## TypeScript Helpers
+
+The package exports named public types for the composable return value and each telemetry method. Prefer these named types when your application stores or accepts one of the functions outside of the component that calls `useTelemetryDeck()`.
+
+```ts
+import type {
+  TelemetryDeckHooks,
+  TelemetryDeckSafeSignal,
+} from "@peerigon/telemetrydeck-vue";
+
+let safeSignal: TelemetryDeckSafeSignal | undefined;
+
+function installTelemetry(hooks: TelemetryDeckHooks) {
+  safeSignal = hooks.safeSignal;
+}
+```
+
 ## Contributions
 
 ### Local Development

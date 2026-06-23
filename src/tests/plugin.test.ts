@@ -1,7 +1,7 @@
 import { mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { defineComponent } from "vue";
-import { useTelemetryDeck } from "../hooks";
+import { useTelemetryDeck, type TelemetryDeckHooks } from "../hooks";
 import { plugin } from "../plugin";
 
 const { mockTelemetryDeck, telemetryDeckCtor } = vi.hoisted(() => {
@@ -55,7 +55,7 @@ describe("plugin onError integration", () => {
         plugins: [[plugin, { appID: "test-app-id", onError }]],
       },
     });
-    const vm = wrapper.vm as unknown as ReturnType<typeof useTelemetryDeck>;
+    const vm = wrapper.vm as unknown as TelemetryDeckHooks;
 
     await expect(vm.safeSignal("ui.opened")).resolves.toBeUndefined();
     await expect(vm.safeQueue("button.clicked")).resolves.toBeUndefined();

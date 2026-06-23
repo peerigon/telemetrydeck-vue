@@ -34,7 +34,7 @@
     "release": "semantic-release",
     "size": "size-limit",
     "test": "vitest --coverage",
-    "test:exports": "node tests/exports/import.mjs && node tests/exports/require.cjs",
+    "test:exports": "node tests/exports/import.mjs && node tests/exports/require.cjs && tsc --noEmit -p tests/exports/tsconfig.json",
     "test:pack": "node tests/pack/contents.mjs",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.build.json"
   },

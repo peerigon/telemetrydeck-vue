@@ -5,7 +5,15 @@ import type {
 } from "@telemetrydeck/sdk";
 import { inject } from "vue";
 
-export type TelemetryDeckMethod = "signal" | "queue" | "flush";
+export type {
+  TelemetryDeckOptions,
+  TelemetryDeckPayload,
+} from "@telemetrydeck/sdk";
+
+export type TelemetryDeckMethod = keyof Pick<
+  TelemetryDeck,
+  "signal" | "queue" | "flush"
+>;
 
 export interface TelemetryDeckErrorMeta {
   method: TelemetryDeckMethod;
@@ -19,7 +27,55 @@ export type TelemetryDeckErrorHandler = (
   meta: TelemetryDeckErrorMeta,
 ) => void | Promise<void>;
 
-export function useTelemetryDeck() {
+export type TelemetryDeckSetClientUser = (clientUser: string) => Promise<void>;
+
+type TelemetryDeckMethodReturn<TMethod extends "signal" | "queue" | "flush"> =
+  Awaited<ReturnType<TelemetryDeck[TMethod]>>;
+
+type TelemetryDeckMethodParameters<
+  TMethod extends "signal" | "queue" | "flush",
+> = Parameters<TelemetryDeck[TMethod]>;
+
+export type TelemetryDeckSignal = (
+  ...args: TelemetryDeckMethodParameters<"signal">
+) => Promise<TelemetryDeckMethodReturn<"signal"> | undefined>;
+
+export type TelemetryDeckQueue = (
+  ...args: TelemetryDeckMethodParameters<"queue">
+) => Promise<TelemetryDeckMethodReturn<"queue"> | undefined>;
+
+export type TelemetryDeckFlush = (
+  ...args: TelemetryDeckMethodParameters<"flush">
+) => Promise<TelemetryDeckMethodReturn<"flush"> | undefined>;
+
+export type TelemetryDeckGetQueueCount = () => number;
+
+export type TelemetryDeckSafeSignal = (
+  type: string,
+  payload?: TelemetryDeckPayload,
+  options?: TelemetryDeckOptions,
+) => Promise<void>;
+
+export type TelemetryDeckSafeQueue = (
+  type: string,
+  payload?: TelemetryDeckPayload,
+  options?: TelemetryDeckOptions,
+) => Promise<void>;
+
+export type TelemetryDeckSafeFlush = () => Promise<void>;
+
+export interface TelemetryDeckHooks {
+  setClientUser: TelemetryDeckSetClientUser;
+  signal: TelemetryDeckSignal;
+  queue: TelemetryDeckQueue;
+  flush: TelemetryDeckFlush;
+  getQueueCount: TelemetryDeckGetQueueCount;
+  safeSignal: TelemetryDeckSafeSignal;
+  safeQueue: TelemetryDeckSafeQueue;
+  safeFlush: TelemetryDeckSafeFlush;
+}
+
+export function useTelemetryDeck(): TelemetryDeckHooks {
   const td = inject<TelemetryDeck>("td");
   const onError = inject<TelemetryDeckErrorHandler | undefined>(
     "tdOnError",
