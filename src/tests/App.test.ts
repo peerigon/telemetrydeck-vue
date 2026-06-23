@@ -90,121 +90,131 @@ describe("App", () => {
 
   it("calls TelemetryDeck methods from the demo controls", async () => {
     const wrapper = mountApp();
+    const randomSpy = vi
+      .spyOn(Math, "random")
+      .mockReturnValueOnce(0.694)
+      .mockReturnValueOnce(0.695);
 
-    mockTelemetryDeck.signal.mockResolvedValueOnce({ accepted: true });
+    try {
+      mockTelemetryDeck.signal.mockResolvedValueOnce({ accepted: true });
 
-    await wrapper.find("#btnSignalClick").trigger("click");
-    await waitForClickHandler();
-    expect(mockTelemetryDeck.signal).toHaveBeenCalledWith(
-      "example_signal_event_name",
-      expect.objectContaining({
-        custom_data: "other_data",
-        source: "signal",
-        timestamp: expect.any(String),
-      }),
-      undefined,
-    );
-    expect(wrapper.find("#lastTelemetryResult").text()).toBe(
-      'signal response: {"accepted":true}',
-    );
+      await wrapper.find("#btnSignalClick").trigger("click");
+      await waitForClickHandler();
+      expect(mockTelemetryDeck.signal).toHaveBeenCalledWith(
+        "example_signal_event_name",
+        expect.objectContaining({
+          custom_data: "other_data",
+          source: "signal",
+          timestamp: expect.any(String),
+        }),
+        undefined,
+      );
+      expect(wrapper.find("#lastTelemetryResult").text()).toBe(
+        'signal response: {"accepted":true}',
+      );
 
-    await wrapper.find("#btnQueueClick").trigger("click");
-    await waitForClickHandler();
-    expect(mockTelemetryDeck.queue).toHaveBeenCalledWith(
-      "example_queue_event_name",
-      expect.objectContaining({
-        custom_data: "other_data",
-        source: "queue",
-        timestamp: expect.any(String),
-      }),
-      undefined,
-    );
-    expect(wrapper.find("#lastTelemetryResult").text()).toBe(
-      "queue promise resolved without response",
-    );
-    expect(wrapper.find("#queuedTelemetryEvents").text()).toBe("1");
+      await wrapper.find("#btnQueueClick").trigger("click");
+      await waitForClickHandler();
+      expect(mockTelemetryDeck.queue).toHaveBeenCalledWith(
+        "example_queue_event_name",
+        expect.objectContaining({
+          custom_data: "other_data",
+          source: "queue",
+          timestamp: expect.any(String),
+        }),
+        undefined,
+      );
+      expect(wrapper.find("#lastTelemetryResult").text()).toBe(
+        "queue promise resolved without response",
+      );
+      expect(wrapper.find("#queuedTelemetryEvents").text()).toBe("1");
 
-    await wrapper.find("#btnQueueClickWithOptions").trigger("click");
-    await waitForClickHandler();
-    expect(mockTelemetryDeck.queue).toHaveBeenCalledWith(
-      "example_queue_event_name_with_options",
-      expect.objectContaining({
-        custom_data: "other_data",
-        source: "queue_with_options",
-        timestamp: expect.any(String),
-      }),
-      { testMode: true, clientUser: "other_user", appID: "other_app_id" },
-    );
+      await wrapper.find("#btnQueueClickWithOptions").trigger("click");
+      await waitForClickHandler();
+      expect(mockTelemetryDeck.queue).toHaveBeenCalledWith(
+        "example_queue_event_name_with_options",
+        expect.objectContaining({
+          custom_data: "other_data",
+          source: "queue_with_options",
+          timestamp: expect.any(String),
+        }),
+        { testMode: true, clientUser: "other_user", appID: "other_app_id" },
+      );
 
-    await wrapper.find("#btnSignalClickWithOptions").trigger("click");
-    await waitForClickHandler();
-    expect(mockTelemetryDeck.signal).toHaveBeenCalledWith(
-      "example_signal_event_name_with_options",
-      expect.objectContaining({
-        custom_data: "other_data",
-        source: "signal_with_options",
-        timestamp: expect.any(String),
-      }),
-      { testMode: true, clientUser: "other_user", appID: "other_app_id" },
-    );
+      await wrapper.find("#btnSignalClickWithOptions").trigger("click");
+      await waitForClickHandler();
+      expect(mockTelemetryDeck.signal).toHaveBeenCalledWith(
+        "example_signal_event_name_with_options",
+        expect.objectContaining({
+          custom_data: "other_data",
+          source: "signal_with_options",
+          timestamp: expect.any(String),
+        }),
+        { testMode: true, clientUser: "other_user", appID: "other_app_id" },
+      );
 
-    await wrapper.find("#btnFlushClick").trigger("click");
-    await waitForClickHandler();
-    expect(mockTelemetryDeck.flush).toHaveBeenCalledTimes(1);
-    expect(wrapper.find("#lastTelemetryResult").text()).toBe(
-      "flush promise resolved without response",
-    );
-    expect(wrapper.find("#queuedTelemetryEvents").text()).toBe("0");
+      await wrapper.find("#btnFlushClick").trigger("click");
+      await waitForClickHandler();
+      expect(mockTelemetryDeck.flush).toHaveBeenCalledTimes(1);
+      expect(wrapper.find("#lastTelemetryResult").text()).toBe(
+        "flush promise resolved without response",
+      );
+      expect(wrapper.find("#queuedTelemetryEvents").text()).toBe("0");
 
-    await wrapper.find("#btnSafeSignalClick").trigger("click");
-    await waitForClickHandler();
-    expect(mockTelemetryDeck.signal).toHaveBeenCalledWith(
-      "example_safe_signal_event_name",
-      expect.objectContaining({
-        source: "safe_signal",
-      }),
-      undefined,
-    );
-    expect(wrapper.find("#lastTelemetryResult").text()).toBe(
-      "safeSignal promise resolved",
-    );
+      await wrapper.find("#btnSafeSignalClick").trigger("click");
+      await waitForClickHandler();
+      expect(mockTelemetryDeck.signal).toHaveBeenCalledWith(
+        "example_safe_signal_event_name",
+        expect.objectContaining({
+          source: "safe_signal",
+        }),
+        undefined,
+      );
+      expect(wrapper.find("#lastTelemetryResult").text()).toBe(
+        "safeSignal promise resolved",
+      );
 
-    await wrapper.find("#btnSafeQueueClick").trigger("click");
-    await waitForClickHandler();
-    expect(mockTelemetryDeck.queue).toHaveBeenCalledWith(
-      "example_safe_queue_event_name",
-      expect.objectContaining({
-        source: "safe_queue",
-      }),
-      undefined,
-    );
-    expect(wrapper.find("#lastTelemetryResult").text()).toBe(
-      "safeQueue promise resolved",
-    );
-    expect(wrapper.find("#queuedTelemetryEvents").text()).toBe("1");
+      await wrapper.find("#btnSafeQueueClick").trigger("click");
+      await waitForClickHandler();
+      expect(mockTelemetryDeck.queue).toHaveBeenCalledWith(
+        "example_safe_queue_event_name",
+        expect.objectContaining({
+          source: "safe_queue",
+        }),
+        undefined,
+      );
+      expect(wrapper.find("#lastTelemetryResult").text()).toBe(
+        "safeQueue promise resolved",
+      );
+      expect(wrapper.find("#queuedTelemetryEvents").text()).toBe("1");
 
-    await wrapper.find("#btnSafeFlushClick").trigger("click");
-    await waitForClickHandler();
-    expect(mockTelemetryDeck.flush).toHaveBeenCalledTimes(2);
-    expect(wrapper.find("#lastTelemetryResult").text()).toBe(
-      "safeFlush promise resolved",
-    );
-    expect(wrapper.find("#queuedTelemetryEvents").text()).toBe("0");
+      await wrapper.find("#btnSafeFlushClick").trigger("click");
+      await waitForClickHandler();
+      expect(mockTelemetryDeck.flush).toHaveBeenCalledTimes(2);
+      expect(wrapper.find("#lastTelemetryResult").text()).toBe(
+        "safeFlush promise resolved",
+      );
+      expect(wrapper.find("#queuedTelemetryEvents").text()).toBe("0");
 
-    let previousClientUser = mockTelemetryDeck.clientUser;
-    await wrapper.find("#btnSetClient").trigger("click");
-    await waitForClickHandler();
-    expect(mockTelemetryDeck.clientUser).not.toBe("");
-    expect(mockTelemetryDeck.clientUser).not.toBe(previousClientUser);
+      let previousClientUser = mockTelemetryDeck.clientUser;
+      await wrapper.find("#btnSetClient").trigger("click");
+      await waitForClickHandler();
+      expect(mockTelemetryDeck.clientUser).toBe("user694");
+      expect(mockTelemetryDeck.clientUser).not.toBe("");
+      expect(mockTelemetryDeck.clientUser).not.toBe(previousClientUser);
 
-    previousClientUser = mockTelemetryDeck.clientUser;
-    await wrapper.find("#btnSetClient").trigger("click");
-    await waitForClickHandler();
-    expect(mockTelemetryDeck.clientUser).not.toBe("");
-    expect(mockTelemetryDeck.clientUser).not.toBe(previousClientUser);
-    expect(wrapper.find("#lastTelemetryResult").text()).toBe(
-      "setClientUser completed",
-    );
+      previousClientUser = mockTelemetryDeck.clientUser;
+      await wrapper.find("#btnSetClient").trigger("click");
+      await waitForClickHandler();
+      expect(mockTelemetryDeck.clientUser).toBe("user695");
+      expect(mockTelemetryDeck.clientUser).not.toBe("");
+      expect(mockTelemetryDeck.clientUser).not.toBe(previousClientUser);
+      expect(wrapper.find("#lastTelemetryResult").text()).toBe(
+        "setClientUser completed",
+      );
+    } finally {
+      randomSpy.mockRestore();
+    }
   });
 
   it("displays TelemetryDeck errors captured by the demo onError handler", async () => {
