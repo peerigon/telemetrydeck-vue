@@ -1,7 +1,7 @@
 import { mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { defineComponent } from "vue";
-import { useTelemetryDeck } from "../hooks";
+import { useTelemetryDeck, type TelemetryDeckHooks } from "../hooks";
 
 const mockTelemetryDeck = {
   clientUser: "test-user",
@@ -51,7 +51,7 @@ describe("useTelemetryDeck safe methods", () => {
         },
       },
     });
-    const vm = wrapper.vm as unknown as ReturnType<typeof useTelemetryDeck>;
+    const vm = wrapper.vm as unknown as TelemetryDeckHooks;
 
     await expect(
       vm.safeSignal("ui.opened", signalPayload),
@@ -98,7 +98,7 @@ describe("useTelemetryDeck safe methods", () => {
         },
       },
     });
-    const vm = wrapper.vm as unknown as ReturnType<typeof useTelemetryDeck>;
+    const vm = wrapper.vm as unknown as TelemetryDeckHooks;
 
     await expect(vm.safeSignal("ui.opened")).resolves.toBeUndefined();
     await expect(vm.safeQueue("button.clicked")).resolves.toBeUndefined();
@@ -141,7 +141,7 @@ describe("useTelemetryDeck safe methods", () => {
         },
       },
     });
-    const vm = wrapper.vm as unknown as ReturnType<typeof useTelemetryDeck>;
+    const vm = wrapper.vm as unknown as TelemetryDeckHooks;
 
     await expect(vm.safeSignal("ui.opened")).resolves.toBeUndefined();
     await expect(vm.safeQueue("button.clicked")).resolves.toBeUndefined();
@@ -180,7 +180,7 @@ describe("useTelemetryDeck safe methods", () => {
         },
       },
     });
-    const vm = wrapper.vm as unknown as ReturnType<typeof useTelemetryDeck>;
+    const vm = wrapper.vm as unknown as TelemetryDeckHooks;
 
     await expect(vm.signal("ui.opened")).rejects.toBe(signalError);
     await expect(vm.queue("button.clicked")).rejects.toBe(queueError);
@@ -197,7 +197,7 @@ describe("useTelemetryDeck safe methods", () => {
         },
       },
     });
-    const vm = wrapper.vm as unknown as ReturnType<typeof useTelemetryDeck>;
+    const vm = wrapper.vm as unknown as TelemetryDeckHooks;
 
     expect(vm.getQueueCount()).toBe(2);
   });
