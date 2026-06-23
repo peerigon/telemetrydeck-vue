@@ -7,8 +7,9 @@ interface TelemetryDeckApp {
 
 export interface TelemetryDeckPluginOptions extends Pick<
   TelemetryDeckOptions,
-  "appID" | "clientUser" | "testMode"
+  "appID" | "testMode"
 > {
+  clientUser?: TelemetryDeckOptions["clientUser"];
   onError?: TelemetryDeckErrorHandler;
 }
 
