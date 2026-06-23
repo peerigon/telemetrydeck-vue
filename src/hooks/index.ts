@@ -10,7 +10,10 @@ export type {
   TelemetryDeckPayload,
 } from "@telemetrydeck/sdk";
 
-export type TelemetryDeckMethod = "signal" | "queue" | "flush";
+export type TelemetryDeckMethod = keyof Pick<
+  TelemetryDeck,
+  "signal" | "queue" | "flush"
+>;
 
 export interface TelemetryDeckErrorMeta {
   method: TelemetryDeckMethod;
@@ -26,19 +29,24 @@ export type TelemetryDeckErrorHandler = (
 
 export type TelemetryDeckSetClientUser = (clientUser: string) => Promise<void>;
 
+type TelemetryDeckMethodReturn<TMethod extends "signal" | "queue" | "flush"> =
+  Awaited<ReturnType<TelemetryDeck[TMethod]>>;
+
+type TelemetryDeckMethodParameters<
+  TMethod extends "signal" | "queue" | "flush",
+> = Parameters<TelemetryDeck[TMethod]>;
+
 export type TelemetryDeckSignal = (
-  type: string,
-  payload?: TelemetryDeckPayload,
-  options?: TelemetryDeckOptions,
-) => Promise<Response | undefined>;
+  ...args: TelemetryDeckMethodParameters<"signal">
+) => Promise<TelemetryDeckMethodReturn<"signal"> | undefined>;
 
 export type TelemetryDeckQueue = (
-  type: string,
-  payload?: TelemetryDeckPayload,
-  options?: TelemetryDeckOptions,
-) => Promise<void | undefined>;
+  ...args: TelemetryDeckMethodParameters<"queue">
+) => Promise<TelemetryDeckMethodReturn<"queue"> | undefined>;
 
-export type TelemetryDeckFlush = () => Promise<Response | undefined>;
+export type TelemetryDeckFlush = (
+  ...args: TelemetryDeckMethodParameters<"flush">
+) => Promise<TelemetryDeckMethodReturn<"flush"> | undefined>;
 
 export type TelemetryDeckGetQueueCount = () => number;
 

@@ -1,14 +1,14 @@
-import TelemetryDeck from "@telemetrydeck/sdk";
+import TelemetryDeck, { type TelemetryDeckOptions } from "@telemetrydeck/sdk";
 import type { TelemetryDeckErrorHandler } from "../hooks";
 
 interface TelemetryDeckApp {
   provide: (key: string, value: unknown) => void;
 }
 
-export interface TelemetryDeckPluginOptions {
-  appID: string;
-  clientUser?: string;
-  testMode?: boolean;
+export interface TelemetryDeckPluginOptions extends Pick<
+  TelemetryDeckOptions,
+  "appID" | "clientUser" | "testMode"
+> {
   onError?: TelemetryDeckErrorHandler;
 }
 
