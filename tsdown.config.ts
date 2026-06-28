@@ -5,7 +5,7 @@ export default defineConfig({
   format: ["esm", "cjs"],
   dts: true,
   tsconfig: "tsconfig.build.json",
-  sourcemap: true,
+  sourcemap: false,
   clean: true,
   minify: true,
   target: "es2020",
