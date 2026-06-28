@@ -1,5 +1,5 @@
 import TelemetryDeck, { type TelemetryDeckOptions } from "@telemetrydeck/sdk";
-import type { TelemetryDeckErrorHandler } from "../hooks";
+import type { TelemetryDeckErrorHandler } from "../hooks/index.js";
 
 interface TelemetryDeckApp {
   provide: (key: string, value: unknown) => void;

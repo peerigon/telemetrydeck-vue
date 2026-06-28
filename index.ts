@@ -1,6 +1,6 @@
-import { plugin } from "./src/plugin";
+import { plugin } from "./src/plugin/index.js";
 
-export * from "./src/hooks";
-export type { TelemetryDeckPluginOptions } from "./src/plugin";
+export * from "./src/hooks/index.js";
+export type { TelemetryDeckPluginOptions } from "./src/plugin/index.js";
 
 export default plugin;

@@ -21,7 +21,8 @@ const packedFiles = new Set(packResult.files.map((file) => file.path));
 const requiredFiles = [
   "dist/index.mjs",
   "dist/index.cjs",
-  "dist/types/index.d.ts",
+  "dist/index.d.mts",
+  "dist/index.d.cts",
 ];
 const missingFiles = requiredFiles.filter((file) => !packedFiles.has(file));
 
