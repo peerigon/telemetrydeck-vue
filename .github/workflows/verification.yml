@@ -24,7 +24,7 @@ jobs:
         with:
           node-version-file: ".nvmrc"
 
-      - name: Install deps and build (with cache)
+      - name: Install deps with cache
         uses: bahmutov/npm-install@v1.12.1
 
       - name: Lint

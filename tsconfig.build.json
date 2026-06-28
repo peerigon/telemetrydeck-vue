@@ -4,7 +4,8 @@
     "allowImportingTsExtensions": false,
     "composite": false,
     "ignoreDeprecations": "6.0",
-    "noEmit": false
+    "noEmit": false,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.build.tsbuildinfo"
   },
   "include": ["index.ts", "src/hooks/**/*.ts", "src/plugin/**/*.ts"]
 }

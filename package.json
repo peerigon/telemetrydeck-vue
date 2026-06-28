@@ -77,6 +77,13 @@
   "peerDependencies": {
     "vue": "^3.0.0"
   },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "^22.18.0 || >=24.11.0",
+      "onFail": "error"
+    }
+  },
   "publishConfig": {
     "access": "public",
     "provenance": true
