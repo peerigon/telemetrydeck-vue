@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
-    "@peerigon/configs": "^15.4.0",
+    "@peerigon/configs": "^18.1.2",
     "@rollup/plugin-commonjs": "^29.0.3",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-replace": "^6.0.3",
@@ -57,25 +57,28 @@
     "@vue/test-utils": "^2.4.11",
     "eslint": "^9.39.4",
     "eslint-plugin-vue": "^10.9.2",
-    "globals": "^17.6.0",
+    "globals": "^17.7.0",
     "jsdom": "^29.1.1",
-    "prettier": "^3.8.4",
-    "rollup": "^4.18.1",
+    "prettier": "^3.9.1",
+    "rollup": "^4.62.2",
     "rollup-plugin-delete": "^3.0.2",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-typescript2": "^0.37.0",
     "semantic-release": "^25.0.5",
     "size-limit": "^12.1.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.61.1",
-    "vite": "^8.0.16",
+    "typescript": ">=6.0.3 <6.1.0",
+    "typescript-eslint": "^8.62.0",
+    "vite": "^8.1.0",
     "vitest": "^4.1.9",
-    "vue": "^3.5.38",
+    "vue": "^3.5.39",
     "vue-eslint-parser": "^10.4.1",
     "vue-tsc": "^3.3.5"
   },
   "peerDependencies": {
     "vue": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
   },
   "publishConfig": {
     "access": "public",
