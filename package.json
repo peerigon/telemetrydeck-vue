@@ -41,7 +41,7 @@
     "release": "semantic-release",
     "size": "size-limit",
     "test": "vitest --coverage",
-    "test:exports": "node tests/exports/import.mjs && node tests/exports/require.cjs && tsc --noEmit -p tests/exports/tsconfig.json",
+    "test:exports": "node tests/exports/import.mjs && node tests/exports/require.cjs && tsc --noEmit -p tests/exports/tsconfig.json && tsc --noEmit -p tests/exports/tsconfig.cjs.json",
     "test:pack": "node tests/pack/contents.mjs",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.build.json"
   },
@@ -76,9 +76,6 @@
   },
   "peerDependencies": {
     "vue": "^3.0.0"
-  },
-  "engines": {
-    "node": "^22.18.0 || >=24.11.0"
   },
   "publishConfig": {
     "access": "public",

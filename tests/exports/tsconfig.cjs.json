@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.app.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "tsBuildInfoFile": "../../node_modules/.tmp/tsconfig.exports-cjs.tsbuildinfo"
+  },
+  "include": ["types-cjs.cts"]
+}
