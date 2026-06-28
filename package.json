@@ -7,6 +7,9 @@
     "url": "git+https://github.com/peerigon/telemetrydeck-vue.git"
   },
   "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
