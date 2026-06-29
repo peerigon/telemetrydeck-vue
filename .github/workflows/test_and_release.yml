@@ -33,6 +33,9 @@ jobs:
       - name: Install deps with cache
         uses: bahmutov/npm-install@v1.12.1
 
+      - name: Build package
+        run: npm run build
+
       - name: 🚀 Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
