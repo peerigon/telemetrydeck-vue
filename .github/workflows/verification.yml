@@ -1,0 +1,56 @@
+name: Verification
+
+on:
+  workflow_call:
+    inputs:
+      size_limit_report:
+        description: "Use the Size Limit PR reporting action instead of the CLI script."
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  verify:
+    name: Build, lint, and test on Node
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7.0.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v6.4.0
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Install deps with cache
+        uses: bahmutov/npm-install@v1.12.1
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Pack contents
+        run: npm run test:pack
+
+      - name: Size Limit
+        if: ${{ !inputs.size_limit_report }}
+        run: npm run size
+
+      - name: Size Limit Report
+        if: ${{ inputs.size_limit_report }}
+        uses: andresz1/size-limit-action@v1.8.0
+        with:
+          github_token: ${{ github.token }}

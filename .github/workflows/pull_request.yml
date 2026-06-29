@@ -1,42 +1,9 @@
 name: Test, lint, build
+
 on: [pull_request]
+
 jobs:
-  build:
-    name: Build, lint, and test on Node
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ".nvmrc"
-
-      - name: Install deps and build (with cache)
-        uses: bahmutov/npm-install@v1
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Format check
-        run: npm run format:check
-
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Test
-        run: npm test
-
-      - name: Build
-        run: npm run build
-
-      - name: Pack contents
-        run: npm run test:pack
-
-      - name: Size Limit
-        uses: andresz1/size-limit-action@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+  verify:
+    uses: ./.github/workflows/verification.yml
+    with:
+      size_limit_report: true
